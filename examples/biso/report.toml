@@ -6,7 +6,8 @@ template = "biso"
 
 [[sections]]
 title = "Périmètre du rapport"
-config = ["entity_id", "year"]
+paragraphs = ["Ce bilan présente les publications de la collection HAL {{config.entity_id}} pour l’année {{config.year}}."]
+missing = "error"
 
 [[sections]]
 title = "Publications et accès ouvert"
@@ -14,13 +15,13 @@ new_page = true
 
 [[sections.sections]]
 title = "Types de publications"
-stats = ["publications"]
+paragraphs = ["Le corpus comprend {{stats.publications}} publications. La figure ci-dessous en présente la répartition par type de document."]
 plots = ["works_type"]
 missing = "error"
 
 [[sections.sections]]
 title = "Accès ouvert"
 new_page = true
-stats = ["oaworksperiod"]
+paragraphs = ["L’évolution de l’accès ouvert est présentée sur la période {{stats.oaworksperiod}}. La figure distingue les publications déposées dans HAL, celles accessibles en dehors de HAL et celles en accès fermé."]
 plots = ["open_access_works"]
 missing = "error"

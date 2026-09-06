@@ -34,8 +34,9 @@ The resulting PDF is `build/biso/report/main.pdf`; the editable archive is
 
 The full catalog also accepts the same data: replace
 `--report examples/biso/report.toml` with `--catalog biso`. Sections without
-matching data disappear. The example layout additionally displays a numeric
-publication count and uses explicit page breaks and required selectors.
+matching data disappear. The layouts present statistics in French sentences with
+bold inline values, using `paragraphs` references such as `{{stats.publications}}`.
+The example layout uses explicit page breaks and requires its referenced data.
 
 Use `make example-biso` as a shortcut for the producer and build commands above,
 or `make test-biso` to execute the same producer and test compilation and

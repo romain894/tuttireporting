@@ -63,6 +63,8 @@ class CatalogTests(unittest.TestCase):
                 build_project(root / name, manifest, catalog_name=name, template_name='article')
             body = (root / 'biso/generated_body.tex').read_text()
             self.assertIn('Accès ouvert', body)
+            self.assertIn(r'\textbf{\tuttiStatOaworksperiod{}}', body)
+            self.assertNotIn('longtable', body)
             self.assertNotIn('Collaborations internationales', body)
             with self.assertRaisesRegex(ValueError, 'either'):
                 build_project(root / 'bad', manifest, catalog_name='biso', report_path=exported)

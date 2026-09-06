@@ -13,9 +13,14 @@ Three inputs have different roles:
 | LaTeX template | Document class, styling, and a starter `main.tex` |
 
 A figure's `output_name` in the manifest matches a selector in `report.toml`.
-The builder resolves these names, generates headings/tables/figures, and copies
+The builder resolves these names, generates headings, prose, tables and figures, and copies
 the assets. Existing `main.tex` is preserved for your commentary; generated
 content is updated on each build.
+
+Write sentences with live values in `report.toml`, for example
+`paragraphs = ["Le corpus comprend {{stats.publications}} publications."]`.
+The builder inserts the generated macro and emphasizes its value in bold.
+See [the TOML guide](sphinx-doc/settings.rst) for optional and required data.
 
 ## Try the BiSO example
 

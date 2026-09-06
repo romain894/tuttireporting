@@ -5,7 +5,13 @@ template = "pubpart"
 
 [[sections]]
 title = "Périmètre du rapport"
-config = ["entity_id", "year", "secondary_entity_id", "entities_acronym", "entities_full_name"]
+paragraphs = [
+  "Ce rapport présente les publications et partenariats de l’entité {{config.entity_id}}.",
+  "L’année de référence du rapport est {{config.year}}.",
+  "L’entité partenaire étudiée est {{config.secondary_entity_id}}.",
+  "Les entités prises en compte sont {{config.entities_full_name}}.",
+  "Leurs sigles sont {{config.entities_acronym}}.",
+]
 
 [[sections]]
 title = "Partenariats institutionnels"

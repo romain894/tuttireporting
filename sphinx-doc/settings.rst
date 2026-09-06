@@ -36,7 +36,7 @@ A separate, reusable ``report.toml`` selects data without containing run values:
     [[sections]]
     title = "Publications"
     new_page = true
-    stats = ["publication_count"]
+    paragraphs = ["The corpus contains {{stats.publication_count}} publications."]
 
     [[sections.sections]]
     title = "Annual distribution"
@@ -51,6 +51,8 @@ Each section accepts:
 
 * ``title``: required heading.
 * ``text``: optional plain-text introduction.
+* ``paragraphs``: array of prose paragraphs with inline ``{{stats.key}}`` or
+  ``{{config.key}}`` references; see below.
 * ``stats``, ``config``, ``plots``: arrays of selectors, empty by default;
   ``["*"]`` selects all entries of that kind.
 * ``new_page``: insert a page break before the heading, default ``false``.
@@ -59,8 +61,42 @@ Each section accepts:
   surviving children are omitted.
 * ``sections``: child sections.
 
-Statistics and configuration are rendered as two-column tables. Unknown fields
-and invalid types are rejected. Text values are escaped for LaTeX.
+Explicit ``stats`` and ``config`` selectors produce two-column tables. Prefer
+``paragraphs`` for readable narrative reports; referencing a value in prose does
+not also select it for a table. Unknown fields and invalid types are rejected.
+Text values are escaped for LaTeX.
+
+Writing sentences with live values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Keep reusable wording in the report definition and actual values in the manifest::
+
+    [[sections]]
+    title = "Périmètre du rapport"
+    paragraphs = [
+      "Ce bilan présente les publications de la collection HAL {{config.entity_id}} pour l’année {{config.year}}.",
+      "Le corpus comprend {{stats.publications}} publications.",
+    ]
+    missing = "error"
+
+Each array entry becomes a paragraph. Values are emphasized in bold by the
+default body renderer. References support nested keys such as
+``{{config.grid.res}}``; whitespace around the reference is optional. These are
+data references, not arbitrary Jinja expressions or raw LaTeX. Literal prose and
+data are escaped, including percent signs, underscores, and ampersands.
+
+The generated sentence calls the existing macro (for example,
+``\textbf{\tuttiStatPublications{}}``). Rebuilding after changing the manifest
+updates that macro's value. No numbers need to be copied into ``report.toml``.
+
+With ``missing = "omit"`` (the default), a paragraph with any missing reference
+is omitted in its entirety. Other paragraphs and figures remain. If nothing
+survives, the section is omitted as usual. Use ``missing = "error"`` when every
+referenced value is required. Invalid syntax always raises an error.
+
+Reusable explanatory sentences belong here; researcher interpretation and review
+comments still belong in the preserved ``main.tex``. The BiSO example and both
+catalog layouts use prose; the automatic layout remains a generic table view.
 
 Without ``--report`` or ``--catalog``, the builder uses inline ``report`` and
 ``sections`` from the manifest. If ``sections`` is absent, it generates sections

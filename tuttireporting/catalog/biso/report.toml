@@ -6,7 +6,12 @@ template = "biso"
 
 [[sections]]
 title = "Périmètre du rapport"
-config = ["entity_id", "year", "entity_acronym", "entity_full_name"]
+paragraphs = [
+  "Ce bilan porte sur l’entité {{config.entity_id}}.",
+  "L’année de référence du rapport est {{config.year}}.",
+  "L’établissement étudié est {{config.entity_full_name}}.",
+  "Son sigle est {{config.entity_acronym}}.",
+]
 
 [[sections]]
 title = "Publications et accès ouvert"
@@ -14,16 +19,22 @@ new_page = true
 
 [[sections.sections]]
 title = "Types de publications"
+paragraphs = ["Le corpus comprend {{stats.publications}} publications."]
 plots = ["works_type"]
 
 [[sections.sections]]
 title = "Accès ouvert"
-stats = ["oaworksperiod"]
+paragraphs = ["L’évolution de l’accès ouvert est présentée sur la période {{stats.oaworksperiod}}."]
 plots = ["open_access_works"]
 
 [[sections.sections]]
 title = "Revues de publication"
-stats = ["bsojournalsnbworks", "bsojournalsnbworksfoundinbso", "bsojournalsnbjournals", "bsojournalsbsoversion"]
+paragraphs = [
+  "L’analyse des revues porte sur {{stats.bsojournalsnbworks}} publications.",
+  "Le rapprochement avec le Baromètre de la science ouverte a permis de retrouver {{stats.bsojournalsnbworksfoundinbso}} publications.",
+  "Le corpus couvre {{stats.bsojournalsnbjournals}} revues.",
+  "La version du Baromètre de la science ouverte utilisée est {{stats.bsojournalsbsoversion}}.",
+]
 plots = ["journals", "journals_hal"]
 
 [[sections.sections]]
@@ -40,7 +51,11 @@ new_page = true
 
 [[sections.sections]]
 title = "Collaborations internationales"
-stats = ["collaborationsnb", "institutionsnb", "countriesnb"]
+paragraphs = [
+  "L’analyse recense {{stats.collaborationsnb}} collaborations.",
+  "Les collaborations concernent {{stats.institutionsnb}} institutions.",
+  "Les partenaires sont répartis dans {{stats.countriesnb}} pays.",
+]
 plots = ["collaboration_map_world", "collaboration_map_europe", "collaboration_names"]
 
 [[sections.sections]]

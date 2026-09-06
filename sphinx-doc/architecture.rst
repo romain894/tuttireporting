@@ -50,12 +50,13 @@ The BiSO layout selects it in a subsection::
 
     [[sections.sections]]
     title = "Accès ouvert"
-    stats = ["oaworksperiod"]
+    paragraphs = ["L’évolution de l’accès ouvert est présentée sur la période {{stats.oaworksperiod}}."]
     plots = ["open_access_works"]
 
 ``output_name`` is the link between these files. The figure's location can change
 without changing the layout, as long as that name stays the same. Statistic
-selectors work similarly: ``oaworksperiod`` selects a key under ``[stats]``.
+references work similarly: ``{{stats.oaworksperiod}}`` inserts a macro for the
+key under ``[stats]`` into a sentence, with its value emphasized in bold.
 
 The builder resolves the path relative to the manifest, checks that the file
 exists, and copies it into the project as ``plots/OpenAccessWorks.pdf``. It writes
@@ -116,7 +117,7 @@ The Python code, in execution order
    * - ``templating.py``
      - Configures Jinja's LaTeX delimiters, escapes text, and renders macros.
    * - ``templates/body.tex.j2``
-     - Turns resolved sections into headings, statistics tables, and figures.
+     - Turns resolved sections into headings, prose, optional tables, and figures.
    * - ``templates/templates.toml``
      - Registry mapping template names to external sources, starters, adapters,
        and copied assets. It contains data only; the resolver has no knowledge of
@@ -127,6 +128,9 @@ Inside ``manifest.py``, ``flatten`` converts nested data into dotted keys.
 the nested sections, omits empty entries, and produces a flat ordered list with
 explicit heading commands. ``Report`` holds that list, metadata, escaped macro
 values, and source/destination asset pairs. It has no filesystem-writing logic.
+Each resolved section's ``paragraphs`` is a list of paragraphs, each containing
+parts with either ``text`` (plain text to escape) or ``macro`` (a validated macro
+name). Custom body renderers can use these parts to style inline values.
 
 Where to make a change
 ----------------------------

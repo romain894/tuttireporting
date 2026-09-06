@@ -53,6 +53,9 @@ class BisoExampleTest(unittest.TestCase):
             body = (output / 'generated_body.tex').read_text()
             self.assertIn('Types de publications', body)
             self.assertIn('Accès ouvert', body)
+            self.assertIn(r'\textbf{\tuttiStatPublications{}}', body)
+            self.assertIn('Ce bilan présente les publications', body)
+            self.assertNotIn('longtable', body)
 
             main = output / 'main.tex'
             main.write_text(main.read_text().replace(

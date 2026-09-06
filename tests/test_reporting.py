@@ -67,6 +67,51 @@ class ReportingTests(unittest.TestCase):
             self.build()
         self.assertFalse(self.output.exists())
 
+    def test_paragraphs_use_macros_and_escape_prose(self):
+        self.layout.write_text('''[[sections]]
+title="Narrative"
+paragraphs=["Score: {{stats.score2}} & status: {{ stats.status }}.",
+            "Sampling interval: {{config.sampling.interval}}."]
+missing="error"
+''')
+        self.build()
+        body = (self.output / 'generated_body.tex').read_text()
+        self.assertIn(r'Score: \textbf{\tuttiStatScoreTwo{}} \& status: \textbf{\tuttiStatStatus{}}.', body)
+        self.assertIn(r'\textbf{\tuttiCfgSamplingInterval{}}', body)
+        self.assertNotIn('longtable', body)
+        self.assertNotIn('{{', body)
+        self.assertIn(r'Complete: 100\%', (self.output / 'generated_variables.tex').read_text())
+        self.manifest.write_text(self.manifest.read_text().replace('124.5', '250.75'))
+        self.build()
+        self.assertEqual(body, (self.output / 'generated_body.tex').read_text())
+        self.assertIn('250.75', (self.output / 'generated_variables.tex').read_text())
+
+    def test_missing_paragraphs_are_omitted_whole(self):
+        self.layout.write_text('''[[sections]]
+title="Available"
+paragraphs=["Keep {{stats.score2}}.", "Drop {{stats.score2}} and {{stats.absent}}."]
+[[sections]]
+title="Absent"
+paragraphs=["Drop {{config.absent}}."]
+''')
+        self.build()
+        body = (self.output / 'generated_body.tex').read_text()
+        self.assertIn('Keep', body)
+        self.assertNotIn('Drop', body)
+        self.assertNotIn('Absent', body)
+        self.layout.write_text(self.layout.read_text() + 'missing="error"\n')
+        with self.assertRaisesRegex(ValueError, 'missing paragraph data'):
+            self.build()
+
+    def test_invalid_paragraphs(self):
+        for value in ['"not an array"', '[1]', '["{{stats.score2"]',
+                      '["{{unknown.key}}"]', '["{{stats.}}"]',
+                      '["{{stats.absent}} {{bad}}"]']:
+            with self.subTest(value=value):
+                self.layout.write_text('[[sections]]\ntitle="Invalid"\nparagraphs=' + value)
+                with self.assertRaises(ValueError):
+                    self.build()
+
     def test_sanitization_and_collisions(self):
         self.assertEqual(to_camel_case('sample_count'), 'SampleCount')
         self.assertEqual(to_camel_case('score2'), 'ScoreTwo')

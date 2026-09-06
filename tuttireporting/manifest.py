@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time
 import math
 from pathlib import Path
+import re
 
 try:
     import tomllib
@@ -129,6 +130,41 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
                 raise ValueError(f'Section {section["title"]!r}: missing {field} key {key!r}')
         return selected
 
+    def paragraphs(section):
+        """Resolve prose into escaped text and validated macro references.
+
+        Missing data omits a whole paragraph, never just a word in a sentence.
+        No LaTeX or arbitrary template expressions are accepted here.
+        """
+        prose = section.get('paragraphs', [])
+        if not isinstance(prose, list) or any(not isinstance(p, str) for p in prose):
+            raise ValueError('section.paragraphs must be an array of strings')
+        result = []
+        tables = {'stats': ('tuttiStat', stats), 'config': ('tuttiCfg', config)}
+        for paragraph in prose:
+            parts, missing = [], []
+            for fragment in re.split(r'(\{\{.*?\}\})', paragraph, flags=re.DOTALL):
+                if fragment.startswith('{{') and fragment.endswith('}}'):
+                    selector = fragment[2:-2].strip()
+                    scope, _, key = selector.partition('.')
+                    if scope not in tables or not key or any(c in key for c in '{}'):
+                        raise ValueError(f'Invalid paragraph reference: {selector!r}; use stats.key or config.key')
+                    prefix, available = tables[scope]
+                    if key not in available:
+                        missing.append(selector)
+                    else:
+                        parts.append({'macro': prefix + to_camel_case(key)})
+                else:
+                    if '{{' in fragment or '}}' in fragment:
+                        raise ValueError('Unbalanced paragraph reference delimiters')
+                    parts.append({'text': fragment})
+            if missing:
+                if section.get('missing', 'omit') == 'error':
+                    raise ValueError(f'Section {section["title"]!r}: missing paragraph data: {", ".join(missing)}')
+            elif paragraph.strip():
+                result.append(parts)
+        return result
+
     def resolve(sections, depth=0):
         if not isinstance(sections, list):
             raise ValueError('sections must be an array of tables')
@@ -137,7 +173,7 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
         resolved = []
         for section in sections:
             _keys(section, {'title', 'text', 'new_page', 'omit_if_empty', 'missing',
-                            'stats', 'config', 'plots', 'sections'}, 'section')
+                            'stats', 'config', 'plots', 'sections', 'paragraphs'}, 'section')
             if not isinstance(section.get('title'), str) or not section['title'].strip():
                 raise ValueError('Each section needs a non-empty title')
             if not isinstance(section.get('text', ''), str):
@@ -151,11 +187,12 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
             for field, available in [('stats', stats), ('config', config)]:
                 rows.extend({'label': k, 'value': available[k]} for k in select(section, field, available))
             figures = [plots[k] for k in select(section, 'plots', plots)]
+            prose = paragraphs(section)
             children = resolve(section.get('sections', []), depth + 1)
-            if section.get('omit_if_empty', True) and not (rows or figures or children or section.get('text')):
+            if section.get('omit_if_empty', True) and not (rows or figures or children or prose or section.get('text')):
                 continue
             resolved.append(dict(title=section['title'], text=section.get('text', ''),
-                                 new_page=section.get('new_page', False), rows=rows, plots=figures,
+                                 new_page=section.get('new_page', False), rows=rows, plots=figures, paragraphs=prose,
                                  command=('section', 'subsection', 'subsubsection')[depth]))
             resolved.extend(children)
         return resolved

@@ -87,10 +87,10 @@ Three names connect the producer to the layout:
      - Report selector
    * - Sum of ``WorksType.data`` counts
      - ``stats.publications``
-     - ``stats = ["publications"]``
+     - ``{{stats.publications}}`` in a paragraph
    * - Returned ``oa_works_period``
      - ``stats.oaworksperiod``
-     - ``stats = ["oaworksperiod"]``
+     - ``{{stats.oaworksperiod}}`` in a paragraph
    * - Exported open-access figure
      - item ``output_name = "open_access_works"``
      - ``plots = ["open_access_works"]``
