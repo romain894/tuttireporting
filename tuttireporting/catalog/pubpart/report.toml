@@ -1,7 +1,7 @@
 # PubPart layout. Selectors match the figure stems, including variants.
 [report]
 title = "Publications et partenariats"
-template = "article"
+template = "pubpart"
 
 [[sections]]
 title = "Périmètre du rapport"

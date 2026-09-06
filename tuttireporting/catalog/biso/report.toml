@@ -2,7 +2,7 @@
 # The producer supplies plain-text values and PDF/PNG/JPEG figures.
 [report]
 title = "Bilan de science ouverte"
-template = "article"
+template = "biso"
 
 [[sections]]
 title = "Périmètre du rapport"

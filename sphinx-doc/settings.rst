@@ -1,8 +1,8 @@
 TOML format
-===========
+=================
 
 Run data
---------
+--------------
 
 The producer supplies ``manifest.toml`` and the referenced figure files::
 
@@ -25,7 +25,7 @@ supported formats are PDF, PNG, and JPEG. ``generated_at`` is supplied by the
 producer, not updated by the builder.
 
 Report definition
------------------
+-----------------------
 
 A separate, reusable ``report.toml`` selects data without containing run values::
 
@@ -42,8 +42,8 @@ A separate, reusable ``report.toml`` selects data without containing run values:
     title = "Annual distribution"
     plots = ["publications"]
 
-``report`` accepts ``title``, ``author``, and ``template``. ``article`` is the
-only bundled LaTeX template.
+``report`` accepts ``title``, ``author``, ``template``, ``template_source``, and
+``template_sha256``. See :doc:`templates` for built-in choices and custom bundles.
 
 Sections are ordered arrays of tables, with up to three heading levels:
 ``sections``, ``sections.sections``, and ``sections.sections.sections``.
@@ -68,11 +68,12 @@ for all configuration, statistics, and figures. An explicit empty array disables
 these sections. An external definition replaces the inline layout and metadata.
 
 Generated project
------------------
+-----------------------
 
 ``main.tex`` is created once and never overwritten. Put commentary there.
 ``generated_variables.tex`` and ``generated_body.tex`` are regenerated.
-Referenced figures are copied into ``plots/`` and template assets into ``tutti/``.
+Referenced figures are copied into ``plots/``. Template assets retain the paths
+declared by their bundle (for example, ``tutti/``, ``dibiso/``, or ``company/``).
 Unreferenced files from previous builds are retained.
 
 Macros use the package prefix: ``\tuttiStatPublicationCount``,
@@ -81,10 +82,9 @@ Macros use the package prefix: ``\tuttiStatPublicationCount``,
 ASCII letters, with digits spelled out; collisions are errors.
 
 Custom templates
-----------------
+----------------------
 
-``--template-dir`` points to a directory containing ``main.tex`` and ``tutti/``.
-The starter must load ``generated_variables.tex`` in its preamble and
-``generated_body.tex`` where the report body belongs. Generated content requires
-``graphicx``, ``booktabs``, and ``longtable``. Template source is trusted LaTeX.
+Use ``--template`` to select a name and ``--template-source`` to provide a local
+directory, ZIP file, or HTTPS URL. See :doc:`templates` for the bundle contract,
+custom body renderers, caching, and instructions for a future template release.
 Changing templates does not overwrite an existing ``main.tex``.

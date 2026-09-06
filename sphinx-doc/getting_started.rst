@@ -1,5 +1,5 @@
 Getting started
-===============
+=====================
 
 Install this checkout with ``pip install -e .``. Prepare run data as described in
 :doc:`settings`, then build a project::

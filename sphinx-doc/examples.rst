@@ -61,7 +61,8 @@ local LaTeX installation; select LuaLaTeX when compiling it in Overleaf.
 HAL is a live source: counts can change between fetches, even for a fixed year.
 To reproduce a particular report, retain its entire data directory, including
 the manifest and PDFs, and rerun only the second command. Building from those
-files does not need network access. Copy results you want to keep elsewhere
+files does not need network access once the template bundle has been cached
+(or when a local template source is provided). Copy results you want to keep elsewhere
 before ``make clean``, which removes ``build/``.
 
 The producer: plots and run values
@@ -121,9 +122,12 @@ breaks. Export the catalog to customize it::
 
 This copies ``report.toml`` and the reference plotting settings in
 ``producer.toml``. The example calls two dibisoplot classes explicitly; it does not
-execute that larger plotting recipe. The catalog and the example still use the
-generic article class, not the old specialized BiSO class. Raw TeX tables and
-BibTeX bibliography assembly remain unsupported.
+execute that larger plotting recipe. The example and the BiSO catalog select the original ``dibiso/biso`` class
+from v0.10.1. Its first use downloads and caches the template archive. A local
+ZIP can be supplied with ``--template-source``; see :doc:`templates`. To switch
+from an earlier generated article project, use a fresh output directory, since
+its existing ``main.tex`` is preserved. Raw TeX tables and BibTeX bibliography
+assembly remain unsupported.
 
 Editing and testing the report
 ------------------------------------

@@ -107,7 +107,8 @@ class ReportingTests(unittest.TestCase):
         (template / 'tutti').mkdir(parents=True)
         (template / 'main.tex').write_text('% Custom starter')
         (template / 'tutti' / 'custom.cls').write_text('% Custom class')
-        self.build(template_name='custom', template_dir=template)
+        (template / 'template.toml').write_text('schema_version=1\n[templates.custom]\nmain="main.tex"\nassets=["tutti"]\n')
+        self.build(template_name='custom', template_source=template)
         self.assertEqual((self.output / 'main.tex').read_text(), '% Custom starter')
         self.assertTrue((self.output / 'tutti' / 'custom.cls').exists())
 

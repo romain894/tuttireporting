@@ -19,3 +19,6 @@ Or use a catalog definition::
 
 .. automodule:: tuttireporting.manifest
    :members: load_report
+
+.. automodule:: tuttireporting.template_bundle
+   :members: load_template, Template

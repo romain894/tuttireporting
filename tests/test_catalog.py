@@ -60,7 +60,7 @@ class CatalogTests(unittest.TestCase):
             manifest = root / 'manifest.toml'
             manifest.write_text('[stats]\noaworksperiod="2020–2024"\n')
             for name in list_reports():
-                build_project(root / name, manifest, catalog_name=name)
+                build_project(root / name, manifest, catalog_name=name, template_name='article')
             body = (root / 'biso/generated_body.tex').read_text()
             self.assertIn('Accès ouvert', body)
             self.assertNotIn('Collaborations internationales', body)

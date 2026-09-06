@@ -1,7 +1,7 @@
 .. mdinclude:: ../README.md
 
 Table of contents
-=================
+=======================
 
 .. toctree::
    :maxdepth: 2
@@ -11,5 +11,6 @@ Table of contents
    architecture
    examples
    settings
+   templates
    reference/index
    development

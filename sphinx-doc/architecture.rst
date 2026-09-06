@@ -28,8 +28,9 @@ There are three distinct choices when building a report:
      - When the document's presentation changes.
 
 A catalog entry is a bundled ``report.toml``. ``--catalog biso`` selects the
-BiSO layout; it does not run an analysis or select a special BiSO document class.
-The layout currently selects the bundled ``article`` template.
+BiSO layout, which declares ``template = "biso"``. It does not run an analysis.
+The selected template uses the original DiBISO BiSO class; it can be overridden
+independently of the layout with ``--template``.
 
 ``producer.toml`` is a separate reference containing the plotting settings from
 the original BiSO/PubPart implementations. The report builder does not read it.
@@ -69,7 +70,7 @@ data should fail the build instead.
 Output and ownership
 --------------------------
 
-The generated project looks like this::
+For the article template, the generated project looks like this::
 
     report/
     ├── main.tex
@@ -106,6 +107,9 @@ The Python code, in execution order
    * - ``builder.py``
      - ``build_project`` orchestrates input loading, template rendering, asset
        copying, and preservation of ``main.tex``.
+   * - ``template_bundle.py``
+     - Resolves built-in names or custom directory/ZIP/HTTPS sources, checks the
+       archive, and reads template entry points and assets.
    * - ``manifest.py``
      - ``load_report`` validates both TOML files and resolves selectors into a
        ``Report`` object ready for rendering.
@@ -113,8 +117,9 @@ The Python code, in execution order
      - Configures Jinja's LaTeX delimiters, escapes text, and renders macros.
    * - ``templates/body.tex.j2``
      - Turns resolved sections into headings, statistics tables, and figures.
-   * - ``templates/article/``
-     - Contains the starter ``main.tex`` and its LaTeX class.
+   * - ``templates/article/``, ``templates/biso/``, ``templates/pubpart/``
+     - Contain starters. Article assets are bundled; BiSO/PubPart use the pinned
+       template archive from the separate repository.
 
 Inside ``manifest.py``, ``flatten`` converts nested data into dotted keys.
 ``select`` matches each section's selectors to available data. ``resolve`` walks

@@ -1,0 +1,20 @@
+% Human-owned: tuttireporting never overwrites this file.
+% Uses the unmodified DiBISO v0.10.1 class and its bundled assets.
+\documentclass[french,11pt]{dibiso/biso}
+\input{generated_variables.tex}
+\title{Bilan \\ Science \\ Ouverte}
+\subtitle{\tuttiReportTitle}
+\titledescription{\tuttiReportAuthor}
+\reporter{\tuttiReportAuthor}
+\ifdefined\tuttiCfgYear
+  \date{Année \tuttiCfgYear}
+\else
+  \date{}
+\fi
+\begin{document}
+\maketitle
+\input{generated_body.tex}
+\clearpage
+\section*{Commentaires}
+% Add interpretation, discussion, and review notes here.
+\end{document}

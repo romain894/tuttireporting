@@ -2,7 +2,7 @@
 # This file contains selectors, not the values for a particular collection.
 [report]
 title = "Bilan de science ouverte — exemple HAL"
-template = "article"
+template = "biso"
 
 [[sections]]
 title = "Périmètre du rapport"

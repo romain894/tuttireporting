@@ -13,8 +13,14 @@ tuttireporting build --manifest build/biso/data/manifest.toml \
   --report examples/biso/report.toml --output build/biso/report --compile --zip
 ```
 
+The example selects the original DiBISO BiSO class from the pinned v0.10.1 ZIP.
+On first use, the builder downloads and caches it. To try this class in an
+existing project that used `article`, choose a new output directory; existing
+`main.tex` is never replaced.
+
 Omit `--compile` if LuaLaTeX/latexmk are not installed. The data producer needs
-internet access; building from its saved manifest and PDF figures does not.
+internet access; building from its saved manifest and PDF figures works offline after the
+BiSO template has been cached (or with a local template ZIP).
 Live HAL data may change, so retain the generated data directory to reproduce a
 particular report. `make clean` removes everything under `build/`.
 

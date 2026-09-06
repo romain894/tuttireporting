@@ -43,6 +43,13 @@ Add `--compile` or `--zip` as needed. Bundled BiSO and PubPart layouts can be
 selected with `--catalog biso` / `--catalog pubpart`, or copied with
 `tuttireporting catalog export biso --output my-biso`.
 
+Choose presentation independently with `--template article`, `--template biso`,
+or `--template pubpart`. BiSO/PubPart use their original classes from the pinned
+DiBISO v0.10.1 release (downloaded once, then cached). Users can provide a template
+bundle with `--template-source ./template-directory`, a ZIP path, or an HTTPS URL.
+See [template bundles](sphinx-doc/templates.rst) for the format and authoring guide.
+Use a fresh output directory when switching templates to get its starter file.
+
 ## Understand and develop
 
 Start with [how the project fits together](sphinx-doc/architecture.rst): input
