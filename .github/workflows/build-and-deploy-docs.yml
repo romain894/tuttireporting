@@ -1,6 +1,8 @@
 name: Build and Deploy Documentation
 
-on: [push]
+on:
+  push: {}
+  workflow_dispatch: {}
 
 permissions:
   id-token: write   # required for deploying to GitHub Pages
