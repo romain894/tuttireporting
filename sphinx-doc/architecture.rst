@@ -117,9 +117,10 @@ The Python code, in execution order
      - Configures Jinja's LaTeX delimiters, escapes text, and renders macros.
    * - ``templates/body.tex.j2``
      - Turns resolved sections into headings, statistics tables, and figures.
-   * - ``templates/article/``, ``templates/biso/``, ``templates/pubpart/``
-     - Contain starters. Article assets are bundled; BiSO/PubPart use the pinned
-       template archive from the separate repository.
+   * - ``templates/templates.toml``
+     - Registry mapping template names to external sources, starters, adapters,
+       and copied assets. It contains data only; the resolver has no knowledge of
+       individual document types.
 
 Inside ``manifest.py``, ``flatten`` converts nested data into dotted keys.
 ``select`` matches each section's selectors to available data. ``resolve`` walks

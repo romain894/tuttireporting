@@ -42,8 +42,8 @@ A separate, reusable ``report.toml`` selects data without containing run values:
     title = "Annual distribution"
     plots = ["publications"]
 
-``report`` accepts ``title``, ``author``, ``template``, ``template_source``, and
-``template_sha256``. See :doc:`templates` for built-in choices and custom bundles.
+``report`` accepts ``title``, ``author``, and ``template``. A template registry
+maps the selected template name to its external source; see :doc:`templates`.
 
 Sections are ordered arrays of tables, with up to three heading levels:
 ``sections``, ``sections.sections``, and ``sections.sections.sections``.
@@ -73,7 +73,7 @@ Generated project
 ``main.tex`` is created once and never overwritten. Put commentary there.
 ``generated_variables.tex`` and ``generated_body.tex`` are regenerated.
 Referenced figures are copied into ``plots/``. Template assets retain the paths
-declared by their bundle (for example, ``tutti/``, ``dibiso/``, or ``company/``).
+declared by their registry (for example, ``tutti/``, ``dibiso/``, or ``company/``).
 Unreferenced files from previous builds are retained.
 
 Macros use the package prefix: ``\tuttiStatPublicationCount``,
@@ -84,7 +84,8 @@ ASCII letters, with digits spelled out; collisions are errors.
 Custom templates
 ----------------------
 
-Use ``--template`` to select a name and ``--template-source`` to provide a local
-directory, ZIP file, or HTTPS URL. See :doc:`templates` for the bundle contract,
-custom body renderers, caching, and instructions for a future template release.
-Changing templates does not overwrite an existing ``main.tex``.
+Use ``--template`` to select a name from ``--templates templates.toml``. Use
+``--template-source`` only to override that selected entry while developing a
+local directory, ZIP, or HTTPS release. See :doc:`templates` for the registry
+contract, adapters, custom body renderers, and caching. Changing templates does
+not overwrite an existing ``main.tex``.

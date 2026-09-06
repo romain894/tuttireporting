@@ -26,13 +26,9 @@ def _write(path: Path, content: str):
 
 
 def build_project(output_dir, manifest_path, template_name=None, *, report_path=None,
-                  template_source=None, template_sha256=None, template_cache=None,
+                  template_source=None, template_registry=None, template_cache=None,
                   template_dir=None, catalog_name=None) -> Path:
-    """Build a report using a named template and optional directory/ZIP/HTTPS source.
-
-    Relative sources in report TOML resolve beside that TOML; explicit Python/CLI
-    sources resolve from the current directory. Existing main.tex is preserved.
-    """
+    """Build a report from a registry-selected template and optional source override."""
     if catalog_name is not None:
         if report_path is not None:
             raise ValueError('Choose either report_path or catalog_name, not both')
@@ -43,13 +39,8 @@ def build_project(output_dir, manifest_path, template_name=None, *, report_path=
         if template_source is not None:
             raise ValueError('Choose either template_source or template_dir, not both')
         template_source = template_dir
-    if template_source is None and report.metadata.get('template_source'):
-        template_source = report.metadata['template_source']
-        if not template_source.startswith(('https://', 'http://')):
-            template_source = Path(report_path or manifest_path).resolve().parent / template_source
     name = template_name or report.metadata['template']
-    checksum = template_sha256 if template_sha256 is not None else report.metadata.get('template_sha256')
-    with load_template(name, template_source, sha256=checksum, cache_dir=template_cache) as template:
+    with load_template(name, template_source, registry=template_registry, cache_dir=template_cache) as template:
         return _assemble(output_dir, report, template)
 
 

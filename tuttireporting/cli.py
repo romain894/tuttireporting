@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 
 from .catalog import export_report, list_reports
-from .template_bundle import BUILTINS
+from .template_bundle import list_templates
 from .builder import build_project, compile_project, zip_project
 
 
@@ -17,9 +17,9 @@ def main(argv=None):
     layout = build.add_mutually_exclusive_group()
     layout.add_argument('--catalog', help='Bundled report layout; see catalog list')
     layout.add_argument('--report', type=Path, help='Reusable report TOML (otherwise inline or automatic layout)')
-    build.add_argument('--template', help='Template name: article, biso, pubpart, or a name in a custom bundle')
-    build.add_argument('--template-source', '--template-dir', help='Template directory, ZIP file, or HTTPS URL')
-    build.add_argument('--template-sha256', help='Expected SHA-256 of the template ZIP')
+    build.add_argument('--template', help='Template name from the template registry')
+    build.add_argument('--templates', type=Path, help='Template registry TOML (default: bundled registry)')
+    build.add_argument('--template-source', '--template-dir', help='Override the selected template source')
     build.add_argument('--template-cache', type=Path, help='Override the template download cache directory')
     build.add_argument('--output', '-o', type=Path, help='Default: report/ beside manifest')
     build.add_argument('--compile', action='store_true')
@@ -30,13 +30,14 @@ def main(argv=None):
     export = actions.add_parser('export', help='Copy editable report and producer TOML files')
     export.add_argument('name')
     export.add_argument('--output', '-o', type=Path, required=True)
-    templates = commands.add_parser('templates', help='Discover built-in LaTeX templates')
+    templates = commands.add_parser('templates', help='List templates in a registry')
     templates.add_argument('action', choices=['list'])
+    templates.add_argument('--templates', type=Path, help='Template registry TOML')
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format='%(message)s')
     try:
         if args.command == 'templates':
-            print('\n'.join(BUILTINS))
+            print('\n'.join(list_templates(args.templates)))
             return
         if args.command == 'catalog':
             if args.action == 'list':
@@ -46,7 +47,7 @@ def main(argv=None):
             return
         output = build_project(args.output or args.manifest.resolve().parent / 'report', args.manifest,
                                args.template, report_path=args.report, template_source=args.template_source,
-                               template_sha256=args.template_sha256, template_cache=args.template_cache,
+                               template_registry=args.templates, template_cache=args.template_cache,
                                catalog_name=args.catalog)
         if args.compile:
             compile_project(output)

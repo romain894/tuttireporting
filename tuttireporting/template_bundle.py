@@ -1,9 +1,4 @@
-"""Resolve LaTeX templates from bundled starters, directories, ZIPs, or HTTPS.
-
-Native bundles declare entry points and copied assets in template.toml. The
-published DiBISO v0.10.1 archive is supported separately, without editing its
-classes or requiring the previous reporting Python API.
-"""
+"""Resolve templates declared by a registry, without template-specific code."""
 from contextlib import contextmanager
 from dataclasses import dataclass
 import hashlib
@@ -20,11 +15,8 @@ import zipfile
 from .manifest import read_toml
 
 log = logging.getLogger(__name__)
-BUILTINS = ('article', 'biso', 'pubpart')
 PACKAGED = Path(__file__).parent / 'templates'
-DIBISO_URL = ('https://github.com/dibiso-upsaclay/dibiso-latex-templates/releases/'
-              'download/v0.10.1/dibiso-latex-template-v0.10.1.zip')
-DIBISO_SHA256 = '82706067f7aadb4175d43128322a4faf0794ca05166bdfd18e4249006eec849e'
+DEFAULT_REGISTRY = PACKAGED / 'templates.toml'
 RESERVED = {'main.tex', 'generated_variables.tex', 'generated_body.tex', 'plots', '.tutti-template.json'}
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 
@@ -54,8 +46,8 @@ def _file(root: Path, value: str) -> Path:
     return path
 
 
-def _assets(root: Path, entries: list[str]) -> list[tuple[Path, str]]:
-    if not isinstance(entries, list):
+def _assets(root: Path, entries) -> list[tuple[Path, str]]:
+    if not isinstance(entries, list) or any(not isinstance(entry, str) for entry in entries):
         raise ValueError('template assets must be an array of relative paths')
     result = {}
     for entry in entries:
@@ -73,37 +65,19 @@ def _assets(root: Path, entries: list[str]) -> list[tuple[Path, str]]:
     return [(path, relative) for relative, path in sorted(result.items())]
 
 
-def _native(root: Path, name: str, provenance: dict) -> Template:
-    definition = read_toml(root / 'template.toml')
-    if set(definition) - {'schema_version', 'version', 'templates'}:
-        raise ValueError('Unknown fields in template.toml')
-    if type(definition.get('schema_version')) is not int or definition['schema_version'] != 1:
-        raise ValueError('template.toml requires schema_version = 1')
+def _registry(path: Path) -> dict:
+    definition = read_toml(path)
+    if set(definition) - {'schema_version', 'templates'} or definition.get('schema_version') != 1:
+        raise ValueError('templates.toml requires schema_version = 1')
     entries = definition.get('templates')
-    if not isinstance(entries, dict) or name not in entries:
-        raise ValueError(f'Template {name!r} is not declared in template.toml')
-    entry = entries[name]
-    if not isinstance(entry, dict) or set(entry) - {'main', 'assets', 'body'}:
-        raise ValueError(f'Invalid definition for template {name!r}')
-    main = _file(root, entry.get('main'))
-    body = _file(root, entry['body']) if 'body' in entry else PACKAGED / 'body.tex.j2'
-    version = definition.get('version')
-    if version is not None and not isinstance(version, str):
-        raise ValueError('Template version must be a string')
-    provenance.update(format='native', version=version)
-    return Template(root, main, body, _assets(root, entry.get('assets', [])), provenance)
+    if not isinstance(entries, dict):
+        raise ValueError('templates.toml requires a [templates] table')
+    return entries
 
 
-def _dibiso(root: Path, name: str, provenance: dict) -> Template:
-    if name not in {'biso', 'pubpart'} or not (root / 'dibiso' / f'{name}.cls').is_file():
-        raise ValueError('Template source needs template.toml (or the DiBISO release for biso/pubpart)')
-    # Preserve upstream paths, classes, and license notices. Only the starter is
-    # supplied by this package to connect the class to declarative content.
-    entries = ['dibiso'] + [p.name for p in root.iterdir()
-                           if p.is_file() and (p.name.startswith('LICENSE') or p.name == 'README.md')]
-    provenance.update(format='dibiso')
-    return Template(root, PACKAGED / name / 'main.tex', PACKAGED / 'body.tex.j2',
-                    _assets(root, entries), provenance)
+def list_templates(registry=None) -> tuple[str, ...]:
+    path = Path(registry or DEFAULT_REGISTRY).resolve()
+    return tuple(sorted(_registry(path)))
 
 
 def _extract(archive: Path, destination: Path) -> Path:
@@ -123,25 +97,13 @@ def _extract(archive: Path, destination: Path) -> Path:
             bundle.extractall(destination)
     except zipfile.BadZipFile as exc:
         raise ValueError(f'Invalid template ZIP: {archive}') from exc
-    # Release ZIPs may contain a single enclosing directory.
     root = destination
-    while not (root / 'template.toml').is_file() and not (root / 'dibiso').is_dir():
-        children = list(root.iterdir())
-        if len(children) != 1 or not children[0].is_dir():
-            break
-        root = children[0]
+    while len(list(root.iterdir())) == 1 and next(root.iterdir()).is_dir():
+        root = next(root.iterdir())
     return root
 
 
-def _hash(path: Path) -> str:
-    with path.open('rb') as stream:
-        digest = hashlib.sha256()
-        for block in iter(lambda: stream.read(1024 * 1024), b''):
-            digest.update(block)
-    return digest.hexdigest()
-
-
-def _download(url: str, cache_dir: Path, expected: str | None) -> Path:
+def _download(url: str, cache_dir: Path) -> Path:
     if urlparse(url).scheme != 'https':
         raise ValueError('Remote template sources must use HTTPS')
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -149,10 +111,8 @@ def _download(url: str, cache_dir: Path, expected: str | None) -> Path:
     if path.is_symlink():
         raise ValueError(f'Template cache entry is a symlink: {path}')
     if path.is_file():
-        if expected and _hash(path) != expected:
-            raise ValueError(f'Cached template checksum mismatch; remove {path} and retry')
         return path
-    log.info('Downloading template bundle: %s', url)
+    log.info('Downloading template: %s', url)
     temporary = None
     try:
         with urlopen(url, timeout=30) as response, tempfile.NamedTemporaryFile(dir=cache_dir, delete=False) as stream:
@@ -165,9 +125,6 @@ def _download(url: str, cache_dir: Path, expected: str | None) -> Path:
                 if total > MAX_ARCHIVE_BYTES:
                     raise ValueError('Template download exceeds 64 MiB')
                 stream.write(block)
-        if expected and _hash(temporary) != expected:
-            raise ValueError('Downloaded template SHA-256 does not match the expected checksum')
-        # Validate the archive before retaining it in the cache.
         with tempfile.TemporaryDirectory() as extracted:
             _extract(temporary, Path(extracted))
         temporary.replace(path)
@@ -178,45 +135,54 @@ def _download(url: str, cache_dir: Path, expected: str | None) -> Path:
 
 
 @contextmanager
-def load_template(name: str, source=None, *, sha256=None, cache_dir=None):
-    """Yield a validated template while extracted files remain available.
+def load_template(name: str, source=None, *, registry=None, cache_dir=None):
+    """Yield a template selected from a registry and optional source override.
 
-    With no source, article is bundled locally; biso/pubpart resolve to the
-    pinned DiBISO release. Custom sources can be directories, ZIPs, or HTTPS URLs.
+    A registry entry describes an existing directory or ZIP: ``main`` and
+    ``assets`` are source-relative. ``adapter`` is registry-relative and lets
+    an untouched upstream release use a local starter.
     """
     if not isinstance(name, str) or not re.fullmatch(r'[A-Za-z][A-Za-z0-9_-]*', name):
         raise ValueError(f'Invalid template name: {name!r}')
-    if sha256 is not None and (not isinstance(sha256, str) or not re.fullmatch(r'[0-9a-fA-F]{64}', sha256)):
-        raise ValueError('template_sha256 must contain 64 hexadecimal characters')
-    sha256 = sha256.lower() if sha256 else None
-    if source is None:
-        if name == 'article':
-            source = PACKAGED / 'article'
-        elif name in {'biso', 'pubpart'}:
-            source, sha256 = DIBISO_URL, sha256 or DIBISO_SHA256
-        else:
-            raise ValueError(f'Unknown template {name!r}; provide --template-source')
-    origin = str(source)
-    provenance = {'name': name, 'source': origin}
+    registry_path = Path(registry or DEFAULT_REGISTRY).resolve()
+    entries = _registry(registry_path)
+    if name not in entries:
+        raise ValueError(f'Unknown template {name!r} in {registry_path}')
+    entry = entries[name]
+    allowed = {'source', 'main', 'adapter', 'assets', 'body', 'version'}
+    if not isinstance(entry, dict) or set(entry) - allowed:
+        raise ValueError(f'Invalid definition for template {name!r}')
+    if ('main' in entry) == ('adapter' in entry):
+        raise ValueError(f'Template {name!r} requires exactly one of main or adapter')
+    if not isinstance(entry.get('source'), str):
+        raise ValueError(f'Template {name!r} requires a source')
+    if 'version' in entry and not isinstance(entry['version'], str):
+        raise ValueError('Template version must be a string')
+    override = source is not None
+    origin = str(source if override else entry['source'])
     if urlparse(origin).scheme in {'http', 'https'}:
         cache = Path(cache_dir) if cache_dir else Path(os.environ.get(
             'TUTTIREPORTING_TEMPLATE_CACHE', str(Path.home() / '.cache' / 'tuttireporting' / 'templates')))
-        path = _download(origin, cache, sha256)
+        archive = _download(origin, cache)
+        archive_source = True
     else:
-        path = Path(source).resolve()
-    if path.is_dir():
-        if sha256:
-            raise ValueError('A template checksum applies to ZIP files, not directories')
-        provenance['source'] = str(path)
-        root = path
-        yield _native(root, name, provenance) if (root / 'template.toml').is_file() else _dibiso(root, name, provenance)
+        archive = Path(origin)
+        if not archive.is_absolute():
+            archive = archive if override else registry_path.parent / archive
+        archive = archive.resolve()
+        archive_source = archive.is_file()
+    provenance = {'name': name, 'source': origin, 'registry': str(registry_path),
+                  'version': entry.get('version')}
+    if archive.is_dir():
+        root = archive
+        main = _file(root, entry['main']) if 'main' in entry else _file(registry_path.parent, entry['adapter'])
+        body = _file(root, entry['body']) if 'body' in entry else PACKAGED / 'body.tex.j2'
+        yield Template(root, main, body, _assets(root, entry.get('assets', [])), provenance)
     else:
-        if not path.is_file() or path.stat().st_size > MAX_ARCHIVE_BYTES:
-            raise ValueError(f'Template ZIP missing or larger than 64 MiB: {path}')
-        actual = _hash(path)
-        if sha256 and actual != sha256:
-            raise ValueError('Template ZIP SHA-256 does not match the expected checksum')
-        provenance['sha256'] = actual
+        if not archive_source or archive.stat().st_size > MAX_ARCHIVE_BYTES:
+            raise ValueError(f'Template ZIP missing or larger than 64 MiB: {archive}')
         with tempfile.TemporaryDirectory(prefix='tutti-template-') as temporary:
-            root = _extract(path, Path(temporary))
-            yield _native(root, name, provenance) if (root / 'template.toml').is_file() else _dibiso(root, name, provenance)
+            root = _extract(archive, Path(temporary))
+            main = _file(root, entry['main']) if 'main' in entry else _file(registry_path.parent, entry['adapter'])
+            body = _file(root, entry['body']) if 'body' in entry else PACKAGED / 'body.tex.j2'
+            yield Template(root, main, body, _assets(root, entry.get('assets', [])), provenance)

@@ -1,0 +1,23 @@
+schema_version = 1
+
+# This is data, not resolver code. A project can supply its own registry with
+# --templates and use any template names and sources it needs.
+[templates.article]
+source = "article"
+main = "main.tex"
+assets = ["tutti"]
+
+# The v0.10.1 release has no machine-readable entry-point descriptor. These
+# adapters leave that release untouched and connect its classes to generated
+# content from this package.
+[templates.biso]
+source = "https://github.com/dibiso-upsaclay/dibiso-latex-templates/releases/download/v0.10.1/dibiso-latex-template-v0.10.1.zip"
+adapter = "adapters/biso.tex"
+assets = ["dibiso", "LICENSE.txt", "LICENSE-GPL-3.0-only.txt", "LICENSE-lppl-1-3c.txt"]
+version = "0.10.1"
+
+[templates.pubpart]
+source = "https://github.com/dibiso-upsaclay/dibiso-latex-templates/releases/download/v0.10.1/dibiso-latex-template-v0.10.1.zip"
+adapter = "adapters/pubpart.tex"
+assets = ["dibiso", "LICENSE.txt", "LICENSE-GPL-3.0-only.txt", "LICENSE-lppl-1-3c.txt"]
+version = "0.10.1"

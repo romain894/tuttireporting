@@ -61,7 +61,7 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
     definition = read_toml(report_path) if report_path else data
     if report_path:
         _keys(definition, {'report', 'sections'}, 'report definition')
-    _keys(definition.get('report', {}), {'title', 'author', 'template', 'template_source', 'template_sha256'}, 'report')
+    _keys(definition.get('report', {}), {'title', 'author', 'template'}, 'report')
     metadata = dict(definition.get('report', {}))
     if not isinstance(data.get('generated_at', ''), (str, datetime)):
         raise ValueError('generated_at must be a string or TOML datetime')

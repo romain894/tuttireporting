@@ -44,10 +44,12 @@ selected with `--catalog biso` / `--catalog pubpart`, or copied with
 `tuttireporting catalog export biso --output my-biso`.
 
 Choose presentation independently with `--template article`, `--template biso`,
-or `--template pubpart`. BiSO/PubPart use their original classes from the pinned
-DiBISO v0.10.1 release (downloaded once, then cached). Users can provide a template
-bundle with `--template-source ./template-directory`, a ZIP path, or an HTTPS URL.
-See [template bundles](sphinx-doc/templates.rst) for the format and authoring guide.
+or `--template pubpart`. A template registry maps those names to a local directory,
+local ZIP, or HTTPS ZIP; BiSO/PubPart use the untouched DiBISO v0.10.1 release with
+local adapters declared in the bundled registry. Pass another registry with
+`--templates templates.toml`, and temporarily override one source with
+`--template-source ./template-directory`. See [template bundles](sphinx-doc/templates.rst)
+for the registry format and authoring guide.
 Use a fresh output directory when switching templates to get its starter file.
 
 ## Understand and develop
@@ -59,6 +61,8 @@ and [Python API](sphinx-doc/reference/index.rst).
 
 - `make test`: fast offline tests.
 - `make test-biso`: live test of the documented producer, PDF compilation, and regeneration.
+- `make test-reports`: generate BiSO and PubPart reports from the live BiSO sample data.
+- `make test-reports-pdf`: generate and compile both reports.
 - `make docs`: build documentation, including the example's actual source files.
 - `make clean`: remove build outputs and caches, including the generated example.
 
