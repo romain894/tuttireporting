@@ -1,0 +1,26 @@
+# A HAL-only subset of the BiSO catalog, with an additional publication count.
+# This file contains selectors, not the values for a particular collection.
+[report]
+title = "Bilan de science ouverte — exemple HAL"
+template = "article"
+
+[[sections]]
+title = "Périmètre du rapport"
+config = ["entity_id", "year"]
+
+[[sections]]
+title = "Publications et accès ouvert"
+new_page = true
+
+[[sections.sections]]
+title = "Types de publications"
+stats = ["publications"]
+plots = ["works_type"]
+missing = "error"
+
+[[sections.sections]]
+title = "Accès ouvert"
+new_page = true
+stats = ["oaworksperiod"]
+plots = ["open_access_works"]
+missing = "error"

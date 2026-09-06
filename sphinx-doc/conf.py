@@ -12,13 +12,13 @@
 #
 import os
 import sys
-from dibisoreporting._version import __version__
 
-sys.path.insert(0, os.path.abspath(os.path.join('..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tuttireporting._version import __version__
 
 # -- Project information -----------------------------------------------------
 
-project = 'DiBISO reporting'
+project = 'Tutti reporting'
 copyright = '2025, Romain THOMAS, GPLv3'
 author = 'Romain THOMAS'
 
@@ -37,8 +37,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx_design",
-    "sphinx_needs",
-    "sphinxcontrib.test_reports",
     "sphinx_mdinclude",
 ]
 autosummary_generate = False  # Set to False to prevent generating separate files
@@ -54,9 +52,7 @@ exclude_patterns = [
     'Thumbs.db',
     '.DS_Store',
     'README.md',
-    'notebooks/README.md',
     '**.ipynb_checkpoints',
-    'sphinx-doc/notebooks/test_report'
 ]
 
 
@@ -74,11 +70,9 @@ html_theme = "pydata_sphinx_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# html_css_files = ['notebooks.css']
 
 # https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/web-components.html
 copybutton_selector = ":not(.prompt) > div.highlight pre"
-# nbsphinx_execute = "never"
 
 # specify to not skip the init function
 # https://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method

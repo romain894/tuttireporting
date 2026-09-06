@@ -8,6 +8,7 @@ Table of contents
    :titlesonly:
 
    getting_started
+   architecture
    examples
    settings
    reference/index

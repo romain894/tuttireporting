@@ -1,0 +1,6 @@
+# These dependencies belong to the example producer, not tuttireporting.
+dibisoplot==0.9
+# dibisoplot 0.9 uses pio.kaleido.scope, removed by newer Plotly versions.
+plotly==5.24.1
+kaleido==0.2.1
+tomli-w==1.2.0

@@ -1,6 +1,5 @@
 cff-version: 1.2.0
-title: dibisoreporting
-doi: 10.5281/zenodo.17251577
+title: tuttireporting
 type: software
 authors:
   - given-names: 'Romain, François'
@@ -8,10 +7,9 @@ authors:
     email: contact@romainthomas.net
     affiliation: Université Paris-Saclay
     orcid: 'https://orcid.org/0009-0008-9900-1930'
-repository-code: 'https://github.com/dibiso-upsaclay/dibisoreporting'
+repository-code: 'https://github.com/romain894/tuttireporting'
 abstract: >-
-  A Python library for generating bibliometric reports, 
-  developed at the DiBISO.
+  Declarative, editable LaTeX reports for scientific runs and bibliometric analyses.
 keywords:
   - Python
   - LaTeX

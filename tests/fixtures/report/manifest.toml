@@ -1,0 +1,14 @@
+# Written by a test producer, independently of report layout.
+generated_at = "2026-09-06T12:00:00Z"
+
+[stats]
+score2 = 124.5
+status = "Complete: 100%"
+
+[config.sampling]
+interval = 0.25
+
+[[items]]
+output_name = "score2"
+path = "plots/score2.pdf"
+caption = "Cumulative effective score"

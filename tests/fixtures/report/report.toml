@@ -1,0 +1,25 @@
+# Reusable, human-written layout. Contains selectors, never per-run values.
+[report]
+title = "Test report"
+author = "Test author"
+template = "article"
+
+[[sections]]
+title = "Run configuration"
+config = ["*"]
+
+[[sections]]
+title = "Results"
+new_page = true
+
+[[sections.sections]]
+title = "Measurements"
+stats = ["score2", "status"]
+plots = ["score2"]
+
+[[sections.sections]]
+title = "Optional diagnostics"
+stats = ["error"]
+# This section disappears when the selected data is absent.
+missing = "omit"
+omit_if_empty = true

@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools>=65", "setuptools-scm>=8.0", "wheel"]
+requires = ["setuptools>=77", "setuptools-scm>=8.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "dibisoreporting"
+name = "tuttireporting"
 dynamic = ["version"]
-description = "A Python library for generating bibliometric reports, developed at the DiBISO."
+description = "Declarative, editable LaTeX reports for scientific runs and bibliometric analyses."
 readme = "README.md"
 authors = [{ name = "Romain Thomas", email = "contact@romainthomas.net" }]
 license = "GPL-3.0-only"
@@ -21,24 +21,27 @@ classifiers = [
     "Topic :: Text Processing :: Markup :: LaTeX",
     "Typing :: Typed"
 ]
-keywords = ["DiBISO", "Data analysis", "Scientific research", "Plotly", "LaTeX"]
+keywords = ["tutti", "Data analysis", "Scientific research", "LaTeX"]
 dependencies = [
-    "dibisoplot>=0.9",
-    "requests",
-    "pdfCropMargins",
-    "pypdf",
-    "kaleido==0.2.1"
+    "jinja2>=3.1,<4",
+    "tomli>=2; python_version < '3.11'",
 ]
 requires-python = ">=3.10"
 
 [tool.setuptools]
-packages = ["dibisoreporting", "dibisoreporting.biso"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["tuttireporting*"]
+
+[tool.setuptools.package-data]
+tuttireporting = ["catalog/*/*.toml", "templates/*.j2", "templates/*/*.tex", "templates/*/tutti/*.cls"]
+
+[project.scripts]
+tuttireporting = "tuttireporting.cli:main"
 
 [tool.setuptools.dynamic]
-version = { attr = "dibisoreporting._version.__version__" }
+version = { attr = "tuttireporting._version.__version__" }
 
 [project.urls]
-Homepage = "https://pypi.org/project/dibisoreporting/"
-Repository = "https://github.com/dibiso-upsaclay/dibisoreporting"
-Documentation = "https://dibiso-upsaclay.github.io/dibisoreporting/"
-DOI = "https://doi.org/10.5281/zenodo.17251577"
+Repository = "https://github.com/romain894/tuttireporting"

@@ -1,0 +1,18 @@
+# Plotting settings preserved from the original report definition.
+# Reference for data producers; not executed by tuttireporting.
+[defaults]
+plot_main_color = "#004e7d"
+
+[[visualizations.InstitutionsLineageCollaborations]]
+
+[[visualizations.TopicsCollaborations]]
+
+[[visualizations.TopicsPotentialCollaborations]]
+
+[[visualizations.WorksCollaborations]]
+name = "citationsnormalized"
+metric = "citation_normalized_percentile"
+
+[[visualizations.WorksCollaborations]]
+name = "citationscount"
+metric = "cited_by_count"

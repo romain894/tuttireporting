@@ -1,0 +1,56 @@
+# BiSO layout. Selectors match figure stems and stats_to_save aliases.
+# The producer supplies plain-text values and PDF/PNG/JPEG figures.
+[report]
+title = "Bilan de science ouverte"
+template = "article"
+
+[[sections]]
+title = "Périmètre du rapport"
+config = ["entity_id", "year", "entity_acronym", "entity_full_name"]
+
+[[sections]]
+title = "Publications et accès ouvert"
+new_page = true
+
+[[sections.sections]]
+title = "Types de publications"
+plots = ["works_type"]
+
+[[sections.sections]]
+title = "Accès ouvert"
+stats = ["oaworksperiod"]
+plots = ["open_access_works"]
+
+[[sections.sections]]
+title = "Revues de publication"
+stats = ["bsojournalsnbworks", "bsojournalsnbworksfoundinbso", "bsojournalsnbjournals", "bsojournalsbsoversion"]
+plots = ["journals", "journals_hal"]
+
+[[sections.sections]]
+title = "Chapitres d’ouvrages"
+plots = ["chapters"]
+
+[[sections.sections]]
+title = "Conférences"
+plots = ["conferences"]
+
+[[sections]]
+title = "Collaborations"
+new_page = true
+
+[[sections.sections]]
+title = "Collaborations internationales"
+stats = ["collaborationsnb", "institutionsnb", "countriesnb"]
+plots = ["collaboration_map_world", "collaboration_map_europe", "collaboration_names"]
+
+[[sections.sections]]
+title = "Collaborations avec le secteur privé"
+plots = ["private_sector_collaborations"]
+
+[[sections]]
+title = "Projets de recherche"
+new_page = true
+plots = ["anr_projects", "european_projects"]
+
+# WorksBibtex settings are preserved in producer.toml as a reference.
+# Bibliography assembly is not implemented by the declarative builder.

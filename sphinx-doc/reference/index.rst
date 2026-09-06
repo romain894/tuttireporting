@@ -1,48 +1,21 @@
-Reference
-=========
+Python API
+==========
 
-.. toctree::
-   :maxdepth: 1
+Build a report from a layout file::
 
-   dibisoreporting
-   biso
-   pubpart
+    from tuttireporting import build_project
 
+    build_project("report", "run/manifest.toml", report_path="report.toml")
 
-.. currentmodule:: dibisoreporting
+Or use a catalog definition::
 
+    build_project("report", "run/manifest.toml", catalog_name="biso")
 
-DibisoReporting
----------------
+.. automodule:: tuttireporting.builder
+   :members: build_project, compile_project, zip_project
 
-.. autosummary::
+.. automodule:: tuttireporting.catalog
+   :members: list_reports, report_path, export_report
 
-   DibisoReporting
-   DibisoReporting.__init__
-   DibisoReporting.add_marco
-   DibisoReporting.get_file_from_path
-   DibisoReporting.get_file_from_url
-   DibisoReporting.create_default_latexmkrc_file
-   DibisoReporting.get_latex_template_from_path
-   DibisoReporting.get_latex_template_from_github
-   DibisoReporting.generate_report
-
-
-Biso
-----
-
-.. autosummary::
-
-   biso.Biso
-   biso.Biso.__init__
-   biso.Biso.generate_report
-
-
-PubPart
--------
-
-.. autosummary::
-
-   pubpart.PubPart
-   pubpart.PubPart.__init__
-   pubpart.PubPart.generate_report
+.. automodule:: tuttireporting.manifest
+   :members: load_report

@@ -6,17 +6,18 @@
 
 .~lock*
 
-dibisoreporting.egg-info
+tuttireporting.egg-info
 
 *.ipynb_checkpoints
 *.ipynb
-!sphinx-doc/notebooks/biso.ipynb
-!sphinx-doc/notebooks/pubpart.ipynb
 
-sphinx-doc/notebooks/biso_report
-sphinx-doc/notebooks/pubpart_report
 
 docs
 
 *.env
 
+
+build/
+dist/
+output_report/
+output_report.zip

@@ -1,7 +1,5 @@
 sphinx
-nbsphinx
 pydata-sphinx-theme
 # sphinx_rtd_theme
 sphinx-mdinclude
-sphinx-test-reports
 sphinx-design

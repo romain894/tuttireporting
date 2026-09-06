@@ -1,0 +1,37 @@
+# PubPart layout. Selectors match the figure stems, including variants.
+[report]
+title = "Publications et partenariats"
+template = "article"
+
+[[sections]]
+title = "Périmètre du rapport"
+config = ["entity_id", "year", "secondary_entity_id", "entities_acronym", "entities_full_name"]
+
+[[sections]]
+title = "Partenariats institutionnels"
+new_page = true
+plots = ["institutions_lineage_collaborations"]
+
+[[sections]]
+title = "Thématiques de recherche"
+new_page = true
+
+[[sections.sections]]
+title = "Thématiques des collaborations"
+plots = ["topics_collaborations"]
+
+[[sections.sections]]
+title = "Collaborations potentielles"
+plots = ["topics_potential_collaborations"]
+
+[[sections]]
+title = "Publications en collaboration"
+new_page = true
+
+[[sections.sections]]
+title = "Impact normalisé des citations"
+plots = ["works_collaborations_citationsnormalized"]
+
+[[sections.sections]]
+title = "Nombre de citations"
+plots = ["works_collaborations_citationscount"]

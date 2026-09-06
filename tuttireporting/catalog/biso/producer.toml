@@ -1,0 +1,54 @@
+# Plotting settings preserved from the original report definition.
+# Reference for data producers; not executed by tuttireporting.
+[defaults]
+plot_main_color = "#004e7d"
+
+[[visualizations.AnrProjects]]
+max_plotted_entities = 20
+
+[[visualizations.Chapters]]
+
+[[visualizations.CollaborationMap]]
+name = "world"
+countries_to_ignore = ["France"]
+[visualizations.CollaborationMap.stats_to_save]
+collaborations_nb = "collaborationsnb"
+institutions_nb = "institutionsnb"
+countries_nb = "countriesnb"
+
+[[visualizations.CollaborationMap]]
+name = "europe"
+resolution = 50
+map_zoom = true
+
+[[visualizations.CollaborationNames]]
+countries_to_exclude = ["fr"]
+max_plotted_entities = 40
+
+[[visualizations.Conferences]]
+max_plotted_entities = 40
+
+[[visualizations.EuropeanProjects]]
+max_plotted_entities = 20
+
+[[visualizations.Journals]]
+[visualizations.Journals.stats_to_save]
+nb_works = "bsojournalsnbworks"
+nb_works_found_in_bso = "bsojournalsnbworksfoundinbso"
+nb_journals = "bsojournalsnbjournals"
+bso_version = "bsojournalsbsoversion"
+
+[[visualizations.JournalsHal]]
+max_plotted_entities = 40
+
+[[visualizations.OpenAccessWorks]]
+[visualizations.OpenAccessWorks.stats_to_save]
+oa_works_period = "oaworksperiod"
+
+[[visualizations.PrivateSectorCollaborations]]
+max_plotted_entities = 35
+
+[[visualizations.WorksBibtex]]
+max_plotted_entities = 1000
+
+[[visualizations.WorksType]]

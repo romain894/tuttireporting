@@ -1,125 +1,34 @@
 Development
-***********
+=================
 
-.. _development:
+Install and test from the repository root::
 
-Prerequisites
-=============
-Before you begin, ensure you have the following installed on your system:
+    python -m venv .venv
+    . .venv/bin/activate
+    pip install -e .
+    make test
 
-- Python 3.10 or higher
-- pip (Python package installer)
+Tests use generic fixtures under ``tests/fixtures`` and do not fetch report data.
 
-Installation
-============
-
-Creating a virtual environment
-------------------------------
-Creating a virtual environment is a best practice to isolate your project dependencies from the system-wide Python
-installation:
-
-#. Open a terminal or command prompt.
-#. Navigate to the root directory of the project.
-#. Run the following command to create a virtual environment:
-
-   .. code-block:: bash
-
-       python -m venv .venv
-
-   This will create a virtual environment named ``.venv`` in your project directory.
-
-#. Activate the virtual environment:
-
-   - On Linux and macOS:
-
-     .. code-block:: bash
-
-         source .venv/bin/activate
-
-   - On Windows:
-
-     .. code-block:: powershell
-
-         .venv\Scripts\activate
-
-
-Installing the dependencies
----------------------------
-With the virtual environment activated, you can now install the required dependencies.
-
-Install the package in editable mode (recommended)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-When installing this package in editable mode, the dependencies (listed in ``pyproject.toml``) will be automatically
-installed. To install the package in editable mode run:
-
-.. code-block:: bash
-
-    pip install -e /path/to/project/root/
-
-In case of problems when importing the library, you may need to use the compatibility mode:
-
-.. code-block:: bash
-
-    pip install -e /path/to/project/root/ --config-settings editable_mode=compat
-
-Installing the package in editable mode will allow you to import it when the virtual environment in active, from any
-path. This is especially useful when developing the package and building the documentation.
-
-Install only the dependencies
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The package dependencies are listed in the ``requirements.txt`` file. Run the following command to install them:
-
-.. code-block:: bash
-
-    pip install -r requirements.txt
-
-To develop ``dibisoreporting`` and ``dibisoplot`` in parallel, you may like to install ``dibisoplot`` in editable mode:
-
-.. code-block:: bash
-
-    pip install -e /path/to/dibisoplot/
-
-In case of problems when importing ``dibisoplot``, you may need to use the compatibility mode:
-
-.. code-block:: bash
-
-    pip install -e /path/to/dibisoplot/ --config-settings editable_mode=compat
-
-Building the documentation
-==========================
-
-The documentation is built with Sphinx.
-
-To build it, you will need to install Sphinx with several other packages, and then build the documentation by calling
-the makefile. During all those steps, you need to have the virtual environment activated.
-
-You need to make sure that Make is installed on your computer (it usually is the case on Linux).
-
-Install Sphinx dependencies
----------------------------
-
-.. code-block:: bash
+Build documentation with::
 
     pip install -r sphinx-doc/requirements.txt
+    make docs
 
-Build
------
+The package version is defined in ``tuttireporting/_version.py``.
 
-Once everything is installed, go in the directory ``sphinx-doc`` and run the following command:
+Run ``make clean`` to remove build outputs and Python caches. The root Makefile
+uses ``.venv/bin/python`` when available; override it with ``make PYTHON=python3 test``.
 
-.. code-block:: bash
+Testing the documented example
+------------------------------------
 
-    make html
+The executable example lives in ``examples/biso/produce.py``. Sphinx includes
+that file and ``report.toml`` with ``literalinclude``, so edits appear in the
+walkthrough without copying code into documentation or a notebook.
 
-If needed, you can run ``make clean`` to rebuild from scratch the documentation.
-
-Make a release
-==============
-
-1. Commit all changes to be included in the release
-2. Update the version file ``dibisoreporting/_version.py`` with the new version identifier
-3. Commit
-4. Create a tag with Git: ``git tag -a vX.X.X -m "short description of changes"``
-5. Push changes: ``git push`` then ``git push --tags``
-6. On GitHub, go to the repository tags, and create a release from the new tag. You can put the same message as the one of the tag.
-7. Check that the release is successfully published on GitHub and PyPI.
+Install ``examples/biso/requirements.txt`` and run ``make test-biso`` to test
+the live producer, compilation, ZIP export, and regeneration. These checks live
+under ``tests/integration`` and run separately from the offline suite. Run
+``make example-biso`` to keep the generated report under ``build/biso`` for
+manual inspection. Both commands accept ``BISO_ENTITY`` and ``BISO_YEAR``.
