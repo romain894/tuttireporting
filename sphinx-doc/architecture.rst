@@ -66,7 +66,9 @@ available as ``\tuttiPlotOpenAccessWorks`` in ``generated_variables.tex``.
 A selected key that is absent is skipped by default. An empty section disappears;
 a parent remains if it has a populated child. This lets the same layout work
 with different subsets of data. Use ``missing = "error"`` in a section if absent
-data should fail the build instead.
+data should be marked as incomplete. Missing plot files are always reported in
+the affected section. Structural errors, malformed TOML, and unsafe paths still
+fail the build before files are written.
 
 Output and ownership
 --------------------------

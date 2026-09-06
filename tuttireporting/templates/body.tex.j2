@@ -5,6 +5,9 @@
 \BLOCK{endif}
 \\VAR{section.command}{\VAR{section.title|tex_escape}}
 \VAR{section.text|tex_escape}
+\BLOCK{if section.errors}
+\begin{quote}\textbf{Report section incomplete:} \VAR{section.errors|join('; ')|tex_escape}\end{quote}
+\BLOCK{endif}
 \BLOCK{for paragraph in section.paragraphs}
 \BLOCK{for part in paragraph}\BLOCK{if part.macro is defined}\textbf{\\VAR{part.macro}{}}\BLOCK{else}\VAR{part.text|tex_escape}\BLOCK{endif}\BLOCK{endfor}
 \par

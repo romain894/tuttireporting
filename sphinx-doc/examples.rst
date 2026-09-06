@@ -87,10 +87,10 @@ Three names connect the producer to the layout:
      - Report selector
    * - Sum of ``WorksType.data`` counts
      - ``stats.publications``
-     - ``{{stats.publications}}`` in a paragraph
+     - ``paragraphs = ["... {{stats.publications}} ..."]``
    * - Returned ``oa_works_period``
      - ``stats.oaworksperiod``
-     - ``{{stats.oaworksperiod}}`` in a paragraph
+     - ``paragraphs = ["... {{stats.oaworksperiod}} ..."]``
    * - Exported open-access figure
      - item ``output_name = "open_access_works"``
      - ``plots = ["open_access_works"]``
@@ -110,8 +110,8 @@ The example's reusable layout contains no fetched values:
    :linenos:
 
 The parent section groups two subsections. ``new_page`` controls page breaks.
-``missing = "error"`` makes missing data an error in this example, so a failed
-producer cannot silently produce an incomplete walkthrough.
+``missing = "error"`` marks missing data in this example, so a failed
+producer leaves its section visible with an incomplete-section notice.
 
 You can also build these inputs using ``--catalog biso`` instead of ``--report``.
 The bundled layout omits unpopulated sections, such as collaborations and research

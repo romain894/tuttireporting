@@ -1,10 +1,15 @@
-% Human-owned after the first build. Adapter for an untouched DiBISO release.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%  BiSO report starter - human-owned after creation  %%%
+%%%%%%%%%%  Add commentary only in this file.                 %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[french,11pt]{dibiso/biso}
 \input{generated_variables.tex}
 \title{Bilan \\ Science \\ Ouverte}
-\subtitle{\tuttiReportTitle}
-\titledescription{\tuttiReportAuthor}
-\reporter{\tuttiReportAuthor}
+\subtitle{\textbf{Laboratoire \tuttiCfgEntityAcronym} \\
+  \medskip
+  \tuttiCfgEntityFullName}
+\titledescription{\tuttiReportTitle}
+\reporter{}
 \ifdefined\tuttiCfgYear
   \date{Année \tuttiCfgYear}
 \else
@@ -12,8 +17,25 @@
 \fi
 \begin{document}
 \maketitle
-\input{generated_body.tex}
+\tableofcontents
 \clearpage
-\section*{Commentaires}
-% Add interpretation, discussion, and review notes here.
+\section{Introduction}
+\subsection*{Méthodologie et objectifs}
+Le BiSO est un bilan de science ouverte établi à partir des publications
+présentes dans HAL. Sauf mention particulière, les données utilisées pour les
+graphiques proviennent de la collection HAL \texttt{\tuttiCfgEntityId} et de
+l’année \tuttiCfgYear.
+
+% Ecrivez ici vos explications, objectifs et éléments de contexte.
+\subsection*{Calendrier annuel}
+% Ecrivez ici les étapes et informations propres à votre laboratoire.
+\subsection*{Déposer dans une archive ouverte}
+% Ecrivez ici vos recommandations et liens utiles.
+\clearpage
+% The following machine-owned file contains the ordered report sections,
+% figures, values, and incomplete-section notices selected by report.toml.
+\input{generated_body.tex}
+% Ecrivez ici vos informations et commentaires sur les jeux de données partagés.
+% Ecrivez ici les atouts du laboratoire dans son engagement pour la science ouverte.
+% Ecrivez ici vos préconisations, pour aller plus loin.
 \end{document}

@@ -57,6 +57,11 @@ local adapters declared in the bundled registry. Pass another registry with
 for the registry format and authoring guide.
 Use a fresh output directory when switching templates to get its starter file.
 
+If a selected plot or value is unavailable, the report is still assembled and
+the affected section contains a visible incomplete-section notice. Fix the data
+and run the same command again; `main.tex` remains preserved. Malformed TOML,
+invalid references, and unsafe paths still stop the build.
+
 ## Understand and develop
 
 Start with [how the project fits together](sphinx-doc/architecture.rst): input
@@ -66,8 +71,9 @@ and [Python API](sphinx-doc/reference/index.rst).
 
 - `make test`: fast offline tests.
 - `make test-biso`: live test of the documented producer, PDF compilation, and regeneration.
-- `make test-reports`: generate BiSO and PubPart reports from the live BiSO sample data.
-- `make test-reports-pdf`: generate and compile both reports.
+- `make test-reports`: generate full BiSO and PubPart reports from scratch.
+- `make test-reports-pdf`: generate and compile both reports with their default
+  templates; unavailable visualizations appear as section failure notices.
 - `make docs`: build documentation, including the example's actual source files.
 - `make clean`: remove build outputs and caches, including the generated example.
 

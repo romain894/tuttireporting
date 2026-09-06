@@ -87,7 +87,7 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
     for prefix, table in [('tuttiStat', stats), ('tuttiCfg', config)]:
         for key, value in table.items():
             macro(prefix, key, tex_escape(value))
-    plots, assets = {}, []
+    plots, assets, plot_errors = {}, [], {}
     items = data.get('items', [])
     if not isinstance(items, list):
         raise ValueError('items must be an array of tables')
@@ -105,17 +105,18 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
         if not source.is_relative_to(manifest_path.parent):
             raise ValueError(f'Plot path escapes the manifest directory: {item["path"]}')
         if not source.is_file():
-            raise ValueError(f'Plot file does not exist: {source}')
-        if source.suffix.lower() not in {'.pdf', '.png', '.jpg', '.jpeg'}:
-            raise ValueError(f'Unsupported plot format: {source.suffix}')
+            plot_errors[key] = f'Plot file does not exist: {item["path"]}'
+        elif source.suffix.lower() not in {'.pdf', '.png', '.jpg', '.jpeg'}:
+            plot_errors[key] = f'Unsupported plot format: {source.suffix}'
         if not isinstance(item.get('caption', ''), str):
             raise ValueError(f'Caption must be a string: {key}')
         relative = 'plots/' + to_camel_case(key) + source.suffix.lower()
         macro('tuttiPlot', key, relative)
         plots[key] = {'path': relative, 'caption': item.get('caption', key)}
-        assets.append((source, relative))
+        if key not in plot_errors:
+            assets.append((source, relative))
 
-    def select(section, field, available):
+    def select(section, field, available, failures):
         selectors = section.get(field, [])
         if not isinstance(selectors, list) or any(not isinstance(s, str) for s in selectors):
             raise ValueError(f'section.{field} must be an array of strings')
@@ -124,10 +125,13 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
             if key == '*':
                 selected.extend(k for k in available if k not in selected)
             elif key in available:
+                if field == 'plots' and key in plot_errors:
+                    failures.append(plot_errors[key])
+                    continue
                 if key not in selected:
                     selected.append(key)
             elif section.get('missing', 'omit') == 'error':
-                raise ValueError(f'Section {section["title"]!r}: missing {field} key {key!r}')
+                failures.append(f'Missing {field} key: {key}')
         return selected
 
     def paragraphs(section):
@@ -183,16 +187,25 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
                     raise ValueError(f'section.{flag} must be a boolean')
             if section.get('missing', 'omit') not in {'omit', 'error'}:
                 raise ValueError('section.missing must be "omit" or "error"')
+            failures = []
             rows = []
             for field, available in [('stats', stats), ('config', config)]:
-                rows.extend({'label': k, 'value': available[k]} for k in select(section, field, available))
-            figures = [plots[k] for k in select(section, 'plots', plots)]
-            prose = paragraphs(section)
+                rows.extend({'label': k, 'value': available[k]} for k in select(section, field, available, failures))
+            figures = [plots[k] for k in select(section, 'plots', plots, failures)]
+            try:
+                prose = paragraphs(section)
+            except ValueError as exc:
+                if section.get('missing', 'omit') == 'error' and 'missing paragraph data' in str(exc):
+                    failures.append(str(exc))
+                    prose = []
+                else:
+                    raise
             children = resolve(section.get('sections', []), depth + 1)
-            if section.get('omit_if_empty', True) and not (rows or figures or children or prose or section.get('text')):
+            if section.get('omit_if_empty', True) and not (rows or figures or children or prose or section.get('text') or failures):
                 continue
             resolved.append(dict(title=section['title'], text=section.get('text', ''),
                                  new_page=section.get('new_page', False), rows=rows, plots=figures, paragraphs=prose,
+                                 errors=failures,
                                  command=('section', 'subsection', 'subsubsection')[depth]))
             resolved.extend(children)
         return resolved

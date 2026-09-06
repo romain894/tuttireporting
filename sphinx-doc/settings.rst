@@ -56,7 +56,8 @@ Each section accepts:
 * ``stats``, ``config``, ``plots``: arrays of selectors, empty by default;
   ``["*"]`` selects all entries of that kind.
 * ``new_page``: insert a page break before the heading, default ``false``.
-* ``missing``: ``"omit"`` (default) skips absent keys; ``"error"`` rejects them.
+* ``missing``: ``"omit"`` (default) skips absent keys; ``"error"`` keeps the
+  section and renders an incomplete-section notice.
 * ``omit_if_empty``: default ``true``; sections with no selected data, text, or
   surviving children are omitted.
 * ``sections``: child sections.
@@ -92,7 +93,9 @@ updates that macro's value. No numbers need to be copied into ``report.toml``.
 With ``missing = "omit"`` (the default), a paragraph with any missing reference
 is omitted in its entirety. Other paragraphs and figures remain. If nothing
 survives, the section is omitted as usual. Use ``missing = "error"`` when every
-referenced value is required. Invalid syntax always raises an error.
+referenced value is required; the section is generated with a visible failure
+notice instead of aborting the entire report. Invalid syntax and unsafe paths
+still raise an error.
 
 Reusable explanatory sentences belong here; researcher interpretation and review
 comments still belong in the preserved ``main.tex``. The BiSO example and both

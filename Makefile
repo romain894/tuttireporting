@@ -7,7 +7,8 @@ SPHINXOPTS ?=
 .PHONY: help test test-biso example-biso test-reports test-reports-pdf docs doc clean
 
 define build_test_reports
-	$(PYTHON) examples/biso/produce.py --entity-id "$(BISO_ENTITY)" --year "$(BISO_YEAR)" --output build/test-reports/data
+	rm -rf build/test-reports
+	$(PYTHON) examples/biso/produce.py --full --entity-id "$(BISO_ENTITY)" --year "$(BISO_YEAR)" --output build/test-reports/data
 	$(PYTHON) -m tuttireporting build --manifest build/test-reports/data/manifest.toml --catalog biso --output build/test-reports/biso $(1)
 	$(PYTHON) -m tuttireporting build --manifest build/test-reports/data/manifest.toml --catalog pubpart --output build/test-reports/pubpart $(1)
 endef
@@ -16,8 +17,8 @@ help:
 	@echo "make test   Run the test suite"
 	@echo "make test-biso     Test the live BiSO example (HAL and LaTeX required)"
 	@echo "make example-biso  Generate the BiSO example under build/biso"
-	@echo "make test-reports      Generate BiSO and PubPart reports under build/test-reports"
-	@echo "make test-reports-pdf  Generate and compile both test reports"
+	@echo "make test-reports      Generate full BiSO and PubPart reports from scratch"
+	@echo "make test-reports-pdf  Generate and compile full reports with default templates"
 	@echo "make docs   Build HTML documentation in docs/html"
 	@echo "make clean  Remove the build directory, documentation output, and Python caches"
 

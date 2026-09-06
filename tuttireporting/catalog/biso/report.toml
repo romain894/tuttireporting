@@ -1,71 +1,84 @@
-# BiSO layout. Selectors match figure stems and stats_to_save aliases.
-# The producer supplies plain-text values and PDF/PNG/JPEG figures.
+# BiSO layout mirroring the original static report order and headings.
 [report]
 title = "Bilan de science ouverte"
 template = "biso"
+author = "Direction des bibliothèques, de l'information et de la science ouverte"
 
 [[sections]]
-title = "Périmètre du rapport"
-paragraphs = [
-  "Ce bilan porte sur l’entité {{config.entity_id}}.",
-  "L’année de référence du rapport est {{config.year}}.",
-  "L’établissement étudié est {{config.entity_full_name}}.",
-  "Son sigle est {{config.entity_acronym}}.",
-]
+title = "Liste des revues"
+plots = ["journals_hal"]
 
 [[sections]]
-title = "Publications et accès ouvert"
+title = "Liste des conférences"
 new_page = true
-
-[[sections.sections]]
-title = "Types de publications"
-paragraphs = ["Le corpus comprend {{stats.publications}} publications."]
-plots = ["works_type"]
-
-[[sections.sections]]
-title = "Accès ouvert"
-paragraphs = ["L’évolution de l’accès ouvert est présentée sur la période {{stats.oaworksperiod}}."]
-plots = ["open_access_works"]
-
-[[sections.sections]]
-title = "Revues de publication"
-paragraphs = [
-  "L’analyse des revues porte sur {{stats.bsojournalsnbworks}} publications.",
-  "Le rapprochement avec le Baromètre de la science ouverte a permis de retrouver {{stats.bsojournalsnbworksfoundinbso}} publications.",
-  "Le corpus couvre {{stats.bsojournalsnbjournals}} revues.",
-  "La version du Baromètre de la science ouverte utilisée est {{stats.bsojournalsbsoversion}}.",
-]
-plots = ["journals", "journals_hal"]
-
-[[sections.sections]]
-title = "Chapitres d’ouvrages"
-plots = ["chapters"]
-
-[[sections.sections]]
-title = "Conférences"
 plots = ["conferences"]
 
 [[sections]]
-title = "Collaborations"
+title = "Liste des chapitres"
 new_page = true
+plots = ["chapters"]
 
-[[sections.sections]]
-title = "Collaborations internationales"
+[[sections]]
+title = "Typologie de la production scientifique"
+new_page = true
+paragraphs = ["Le corpus comprend {{stats.publications}} publications."]
+plots = ["works_type"]
+
+[[sections]]
+title = "Articles et Communications de congrès en accès ouvert"
+new_page = true
+paragraphs = ["L’évolution de l’accès ouvert est présentée sur la période {{stats.oaworksperiod}}."]
+plots = ["open_access_works"]
+
+[[sections]]
+title = "Liste des revues et les voies d'accès ouvert repérés dans le BSO"
+new_page = true
 paragraphs = [
-  "L’analyse recense {{stats.collaborationsnb}} collaborations.",
-  "Les collaborations concernent {{stats.institutionsnb}} institutions.",
-  "Les partenaires sont répartis dans {{stats.countriesnb}} pays.",
+  "Sur {{stats.bsojournalsnbworks}} travaux dans HAL, {{stats.bsojournalsnbworksfoundinbso}} ont été trouvés dans le BSO.",
+  "Le corpus couvre {{stats.bsojournalsnbjournals}} revues (version {{stats.bsojournalsbsoversion}}).",
 ]
-plots = ["collaboration_map_world", "collaboration_map_europe", "collaboration_names"]
+plots = ["journals", "journals_hal"]
 
-[[sections.sections]]
+[[sections]]
+title = "Carte des collaborations internationales"
+new_page = true
+paragraphs = ["{{stats.collaborationsnb}} collaborations concernent {{stats.institutionsnb}} institutions dans {{stats.countriesnb}} pays."]
+plots = ["collaboration_map_world"]
+
+[[sections]]
+title = "Carte des collaborations Européennes"
+new_page = true
+plots = ["collaboration_map_europe"]
+
+[[sections]]
+title = "Collaborations internationales par établissements"
+new_page = true
+plots = ["collaboration_names"]
+
+[[sections]]
 title = "Collaborations avec le secteur privé"
+new_page = true
 plots = ["private_sector_collaborations"]
 
 [[sections]]
-title = "Projets de recherche"
+title = "Publications liées à des projets européens"
 new_page = true
-plots = ["anr_projects", "european_projects"]
+plots = ["european_projects"]
 
-# WorksBibtex settings are preserved in producer.toml as a reference.
-# Bibliography assembly is not implemented by the declarative builder.
+[[sections]]
+title = "Publications liées à des projets ANR"
+plots = ["anr_projects"]
+
+[[sections]]
+title = "Jeux de données partagés"
+new_page = true
+text = "Un guichet unique est à votre disposition pour vous accompagner sur toutes les questions en lien avec les données de la recherche."
+
+[[sections]]
+title = "Les atouts du Laboratoire dans son engagement pour la science ouverte"
+new_page = true
+text = ""
+
+[[sections]]
+title = "Préconisations, pour aller plus loin"
+text = ""

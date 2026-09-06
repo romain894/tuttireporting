@@ -63,9 +63,20 @@ class ReportingTests(unittest.TestCase):
         self.layout.write_text('[[sections]]\ntitle="Absent"\nstats=["missing"]\nomit_if_empty=false\n')
         self.assertEqual(load_report(self.manifest, self.layout).sections[0]['title'], 'Absent')
         self.layout.write_text(self.layout.read_text() + 'missing="error"\n')
-        with self.assertRaisesRegex(ValueError, 'missing stats key'):
-            self.build()
-        self.assertFalse(self.output.exists())
+        self.build()
+        body = (self.output / 'generated_body.tex').read_text()
+        self.assertIn('Report section incomplete', body)
+        self.assertIn('Missing stats key', body)
+
+    def test_missing_plot_is_reported_and_later_recovers(self):
+        self.manifest.write_text(self.manifest.read_text().replace('plots/score2.pdf', 'plots/missing.pdf'))
+        self.build()
+        body = (self.output / 'generated_body.tex').read_text()
+        self.assertIn('Report section incomplete', body)
+        self.assertIn('Plot file does not exist', body)
+        (self.source / 'plots/missing.pdf').write_bytes(b'%PDF-1.4 recovered')
+        self.build()
+        self.assertNotIn('Report section incomplete', (self.output / 'generated_body.tex').read_text())
 
     def test_paragraphs_use_macros_and_escape_prose(self):
         self.layout.write_text('''[[sections]]
@@ -100,8 +111,8 @@ paragraphs=["Drop {{config.absent}}."]
         self.assertNotIn('Drop', body)
         self.assertNotIn('Absent', body)
         self.layout.write_text(self.layout.read_text() + 'missing="error"\n')
-        with self.assertRaisesRegex(ValueError, 'missing paragraph data'):
-            self.build()
+        self.build()
+        self.assertIn('missing paragraph data', (self.output / 'generated_body.tex').read_text())
 
     def test_invalid_paragraphs(self):
         for value in ['"not an array"', '[1]', '["{{stats.score2"]',
@@ -109,8 +120,8 @@ paragraphs=["Drop {{config.absent}}."]
                       '["{{stats.absent}} {{bad}}"]']:
             with self.subTest(value=value):
                 self.layout.write_text('[[sections]]\ntitle="Invalid"\nparagraphs=' + value)
-                with self.assertRaises(ValueError):
-                    self.build()
+            with self.assertRaises(ValueError):
+                self.build()
 
     def test_sanitization_and_collisions(self):
         self.assertEqual(to_camel_case('sample_count'), 'SampleCount')
@@ -133,10 +144,13 @@ paragraphs=["Drop {{config.absent}}."]
 
     def test_plot_paths_and_duplicate_names(self):
         original = self.manifest.read_text()
-        for path in ['../outside.pdf', '/tmp/external.pdf', 'missing.pdf']:
+        for path in ['../outside.pdf', '/tmp/external.pdf']:
             self.manifest.write_text(original.replace('plots/score2.pdf', path))
             with self.assertRaises(ValueError):
                 self.build()
+        self.manifest.write_text(original.replace('plots/score2.pdf', 'missing.pdf'))
+        self.build()
+        self.assertIn('Plot file does not exist', (self.output / 'generated_body.tex').read_text())
         self.manifest.write_text(original + '\n[[items]]\noutput_name="score2"\npath="plots/score2.pdf"\n')
         with self.assertRaisesRegex(ValueError, 'Duplicate'):
             self.build()

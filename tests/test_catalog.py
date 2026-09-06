@@ -62,7 +62,7 @@ class CatalogTests(unittest.TestCase):
             for name in list_reports():
                 build_project(root / name, manifest, catalog_name=name, template_name='article')
             body = (root / 'biso/generated_body.tex').read_text()
-            self.assertIn('Accès ouvert', body)
+            self.assertIn('Articles et Communications de congrès en accès ouvert', body)
             self.assertIn(r'\textbf{\tuttiStatOaworksperiod{}}', body)
             self.assertNotIn('longtable', body)
             self.assertNotIn('Collaborations internationales', body)
