@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push: {}
+  pull_request: {}
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-all:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            examples/biso/requirements.txt
+
+      - name: Install LaTeX dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            latexmk biber texlive-luatex texlive-latex-extra \
+            texlive-bibtex-extra texlive-fonts-recommended texlive-fonts-extra \
+            texlive-lang-french texlive-pictures tipa fonts-noto-color-emoji
+
+      - name: Install Python dependencies
+        run: python -m pip install -e '.[dev]' -r examples/biso/requirements.txt
+
+      - name: Run all tests
+        run: make test-all PYTHON=python

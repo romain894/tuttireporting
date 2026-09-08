@@ -27,6 +27,10 @@ Pass pytest options with ``PYTEST_ARGS``, for example::
 The last command runs every group. Test outputs use temporary directories;
 use pytest's ``--basetemp`` option to choose their location.
 
+The GitHub Actions ``Tests`` workflow runs ``make test-all`` on pushes and pull
+requests, and can also be started manually. It uses Python 3.12 on Ubuntu with
+the example and LaTeX dependencies installed. Live service failures fail the job.
+
 The old ``test-unit`` alias is now ``test``; ``test-biso``, ``test-live-biso``,
 and the ``test-catalogs*`` / ``test-reports*`` targets are consolidated into
 ``test-live``. Use ``example`` instead of ``example-biso`` and ``docs`` instead
