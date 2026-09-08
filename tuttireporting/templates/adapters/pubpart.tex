@@ -1,34 +1,34 @@
 % Human-owned after the first build. Adapter for an untouched DiBISO release.
 \documentclass[french,11pt]{dibiso/pubpart}
 \input{generated_variables.tex}
-\usepackage{biblatex}
-\setlength{\bibitemsep}{6pt}
 \title{Publications \\ \& \\ Partenariats}
 \subtitle{\textbf{\ifdefined\tuttiCfgEntitiesAcronym\tuttiCfgEntitiesAcronym\fi} \\
   \medskip
   \ifdefined\tuttiCfgEntitiesFullName\tuttiCfgEntitiesFullName\fi}
-\titledescription{\textbf{\Large Liste des travaux} \\
-  \medskip
-  \large Ce document contient la liste des co-publications de
-  \ifdefined\tuttiCfgEntitiesFullName\tuttiCfgEntitiesFullName\fi
-  pour la période \ifdefined\tuttiCfgYear\tuttiCfgYear\fi
-  \ifdefined\tuttiCfgDataFetchDate\ au \tuttiCfgDataFetchDate\fi,
-  utilisés pour réaliser le rapport Publications \& Partenariats.}
-\ifdefined\tuttiBibliographyFile
-  \addbibresource{\tuttiBibliographyFile}
-\fi
+% Fill in the reporter's name and email here.
+\reporter{}
+\reporteremail{}
 \ifdefined\tuttiCfgYear
   \date{\tuttiCfgYear}
 \else
   \date{}
 \fi
+% Compatibility variables used by the upstream report's final page.
+\providecommand{\datafetchdate}{\ifdefined\tuttiCfgDataFetchDate\tuttiCfgDataFetchDate\else\tuttiGeneratedAt\fi}
+\renewcommand{\makelastpagecode}{
+  \subsection*{Code :}
+  \begin{description}
+    \item[Analyses et visualisations :] \texttt{dibisoplot}
+      \ifdefined\tuttiCfgDibisoplotVersion\ v\tuttiCfgDibisoplotVersion\fi
+    \item[Modèle LaTeX :] \url{https://github.com/dibiso-upsaclay/dibiso-latex-templates}
+    \item[Génération du rapport :] \texttt{tuttireporting} v\tuttiReportingVersion
+  \end{description}
+}
 \begin{document}
+\renewcommand{\arraystretch}{2}
 \maketitle
+\tableofcontents
+\clearpage
 \input{generated_body.tex}
-\ifdefined\tuttiBibliographyFile
-  \nocite{*}
-  {\footnotesize\printbibliography}
-  \medskip
-  \makelastpagebiblio
-\fi
+\makelastpagereport
 \end{document}

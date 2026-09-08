@@ -1,6 +1,7 @@
 """Build every catalog from one full live producer run."""
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -31,7 +32,7 @@ def full_manifest(tmp_path_factory):
 
 
 @pytest.mark.parametrize('catalog', list_reports())
-def test_full_catalog_compiles(full_manifest, tmp_path, catalog):
+def test_full_catalog_compiles(full_manifest, tmp_path, catalog, pytestconfig):
     output = build_project(tmp_path / catalog, full_manifest, catalog_name=catalog)
     if catalog == 'biso':
         assert (output / 'references.bib').stat().st_size > 0
@@ -39,3 +40,14 @@ def test_full_catalog_compiles(full_manifest, tmp_path, catalog):
     assert (output / 'main.pdf').read_bytes().startswith(b'%PDF-')
     if catalog == 'biso':
         assert r'\entry{' in (output / 'main.bbl').read_text(encoding='utf-8')
+
+    # Compile in a fresh temporary project so preserved main.tex files cannot
+    # mask template changes. Export only the checked PDF for manual review.
+    report_output = pytestconfig.getoption('--report-output-dir')
+    if report_output is not None:
+        destination = report_output / catalog / 'main.pdf'
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(output / 'main.pdf', destination)
+        reporter = pytestconfig.pluginmanager.get_plugin('terminalreporter')
+        if reporter is not None:
+            reporter.write_line(f'{catalog} PDF: {destination.resolve()}')

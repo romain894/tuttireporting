@@ -24,8 +24,19 @@ Pass pytest options with ``PYTEST_ARGS``, for example::
     make test-live PYTEST_ARGS='-k full_catalog'
     make test-all
 
-The last command runs every group. Test outputs use temporary directories;
-use pytest's ``--basetemp`` option to choose their location.
+The last command runs every group and saves successfully compiled catalog PDFs
+for manual review:
+
+* ``build/test-reports/biso/main.pdf``
+* ``build/test-reports/pubpart/main.pdf``
+
+Override the destination with ``make test-all TEST_REPORTS_DIR=/tmp/reports``.
+Each report is compiled in a fresh temporary project before its PDF is copied,
+so existing ``main.tex`` files cannot hide template changes. Other test outputs
+remain temporary; use pytest's ``--basetemp`` option to choose their location.
+Direct pytest runs can opt in with ``--report-output-dir=build/test-reports``.
+The current live catalog fixture supplies BiSO data; the pubpart PDF therefore
+shows missing-figure notices until a PubPart/OpenAlex producer is supplied.
 
 The GitHub Actions ``Tests`` workflow runs ``make test-all`` on pushes and pull
 requests, and can also be started manually. It uses Python 3.12 on Ubuntu with

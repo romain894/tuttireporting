@@ -3,6 +3,7 @@ PYTEST_ARGS ?=
 BISO_ENTITY ?= UNIV-PARIS-SACLAY
 BISO_YEAR ?= 2024
 BISO_BIBLIOGRAPHY_LIMIT ?= 100
+TEST_REPORTS_DIR ?= build/test-reports
 SPHINXOPTS ?=
 
 .DEFAULT_GOAL := help
@@ -12,7 +13,7 @@ help:
 	@echo "make test       Run the fast offline tests"
 	@echo "make test-pdf   Run offline tests including LaTeX compilation"
 	@echo "make test-live  Run live producer and catalog integration tests"
-	@echo "make test-all   Run all tests, including PDF and live integration tests"
+	@echo "make test-all   Run all tests and save catalog PDFs under $(TEST_REPORTS_DIR)"
 	@echo "make example    Generate the BiSO example under build/biso"
 	@echo "make docs       Build HTML documentation in docs/html"
 	@echo "make clean      Remove build outputs and Python caches"
@@ -28,7 +29,7 @@ test-live:
 	BISO_ENTITY="$(BISO_ENTITY)" BISO_YEAR="$(BISO_YEAR)" BISO_BIBLIOGRAPHY_LIMIT="$(BISO_BIBLIOGRAPHY_LIMIT)" $(PYTHON) -m pytest --run-live -m live $(PYTEST_ARGS)
 
 test-all:
-	BISO_ENTITY="$(BISO_ENTITY)" BISO_YEAR="$(BISO_YEAR)" BISO_BIBLIOGRAPHY_LIMIT="$(BISO_BIBLIOGRAPHY_LIMIT)" $(PYTHON) -m pytest --run-pdf --run-live $(PYTEST_ARGS)
+	BISO_ENTITY="$(BISO_ENTITY)" BISO_YEAR="$(BISO_YEAR)" BISO_BIBLIOGRAPHY_LIMIT="$(BISO_BIBLIOGRAPHY_LIMIT)" $(PYTHON) -m pytest --run-pdf --run-live --report-output-dir="$(TEST_REPORTS_DIR)" $(PYTEST_ARGS)
 
 example:
 	$(PYTHON) examples/biso/produce.py --entity-id "$(BISO_ENTITY)" --year "$(BISO_YEAR)"

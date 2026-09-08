@@ -152,3 +152,28 @@ Use ``--template`` to select a name from ``--templates templates.toml``. Use
 local directory, ZIP, or HTTPS release. See :doc:`templates` for the registry
 contract, adapters, custom body renderers, and caching. Changing templates does
 not overwrite an existing ``main.tex``.
+
+Report figure narrative
+-----------------------
+
+Sections may provide ``plot_captions``, a table mapping plot selectors to
+caption text with the same ``{{config.key}}`` and ``{{stats.key}}`` references
+as paragraphs. If caption data is absent, the manifest caption is retained.
+``figure_notes`` adds optional small-print paragraphs after figures;
+missing note data omits that note. ``after_plots`` adds explanatory paragraphs,
+``bullets`` adds an itemized list, and ``closing_paragraphs`` follows the list.
+These fields accept the same safe references as ``paragraphs``. HTTP(S) URLs
+in prose are rendered as clickable, breakable links; raw LaTeX remains escaped.
+
+The ``pubpart`` catalog implements the six-section Publications & Partenariats
+report. Supply ``config.year`` (a year or period), ``config.entities_full_name``
+and ``config.entities_acronym``. Its five figure selectors are declared in the
+catalog's ``producer.toml``; optional figure notes use the corresponding stem
+without underscores plus ``info`` under ``stats`` (for example,
+``stats.topicscollaborationsinfo``). Missing figures produce visible incomplete
+section notices. ``config.data_fetch_date`` and ``config.dibisoplot_version``
+populate the final-page metadata when available.
+
+Existing ``main.tex`` files remain human-owned. Use a fresh output directory
+or update the existing starter to adopt the corrected pubpart cover, contents
+and final page.
