@@ -65,15 +65,13 @@ class BisoExampleTest(unittest.TestCase):
                 self.assertEqual(archive.read('main.tex'), before[0])
                 self.assertIn('plots/OpenAccessWorks.pdf', archive.namelist())
 
-            # The full catalog requires bibliography data that the small
-            # example does not produce. Full builds are covered in test_catalogs.
+            # The full catalog also accepts runs without bibliography data.
             result = subprocess.run(
                 [sys.executable, '-m', 'tuttireporting', 'build', '--manifest',
                  str(manifest_path), '--catalog', 'biso', '--output', str(root / 'catalog')],
                 cwd=ROOT, capture_output=True, text=True, timeout=240,
             )
-            self.assertNotEqual(result.returncode, 0)
-            self.assertIn("Report bibliography must name a manifest file: 'references'", result.stderr)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 
 if __name__ == '__main__':

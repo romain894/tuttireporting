@@ -91,3 +91,12 @@ with shared data in `tests/fixtures`. Plain `python -m pytest` runs the offline
 unit suite; opt in with `--run-pdf` or `--run-live`. Pass filters through Make,
 for example `make test PYTEST_ARGS='-k catalog'`. See the
 [development guide](sphinx-doc/development.rst) for prerequisites and selection.
+
+Bibliography inclusion is opt-in. Keep `bibliography = "references"` in
+`[report]` and provide the named `[[files]]` asset as before, then set
+`include_bibliography = true` under `[config]` in the manifest to print it.
+If false, omitted, or the named asset is absent, the PDF omits the bibliography
+and `generated_bibliography.tex` contains `% \makebiblio` for later activation.
+Supplied assets are still copied. Rebuilding regenerates this command while
+preserving `main.tex`; existing projects need the updated starter's bibliography
+setup and `\input{generated_bibliography.tex}` (or a fresh output directory).

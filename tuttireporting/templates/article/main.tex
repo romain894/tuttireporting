@@ -8,13 +8,17 @@
 \title{\tuttiReportTitle}
 \author{\tuttiReportAuthor}
 \date{\tuttiGeneratedAt}
-\begin{document}
-\maketitle
-\input{generated_body.tex}
+\providecommand{\makebiblio}{}
+\renewcommand{\makebiblio}{%
 \ifdefined\tuttiBibliographyFile
   \nocite{*}
   \printbibliography
 \fi
+}
+\begin{document}
+\maketitle
+\input{generated_body.tex}
+\input{generated_bibliography.tex}
 \clearpage
 \section*{Commentary}
 % Add interpretation, discussion, and review notes here.

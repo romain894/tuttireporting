@@ -19,6 +19,14 @@
 \else
   \date{}
 \fi
+\providecommand{\makebiblio}{}
+\renewcommand{\makebiblio}{%
+\ifdefined\tuttiBibliographyFile
+  \clearpage
+  \nocite{*}
+  {\footnotesize\printbibliography}
+\fi
+}
 \begin{document}
 \maketitle
 \tableofcontents
@@ -39,11 +47,7 @@ l’année \tuttiCfgYear.
 % The following machine-owned file contains the ordered report sections,
 % figures, values, and incomplete-section notices selected by report.toml.
 \input{generated_body.tex}
-\ifdefined\tuttiBibliographyFile
-  \clearpage
-  \nocite{*}
-  {\footnotesize\printbibliography}
-\fi
+\input{generated_bibliography.tex}
 % Ecrivez ici vos informations et commentaires sur les jeux de données partagés.
 % Ecrivez ici les atouts du laboratoire dans son engagement pour la science ouverte.
 % Ecrivez ici vos préconisations, pour aller plus loin.

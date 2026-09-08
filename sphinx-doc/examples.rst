@@ -113,8 +113,9 @@ The parent section groups two subsections. ``new_page`` controls page breaks.
 ``missing = "error"`` marks missing data in this example, so a failed
 producer leaves its section visible with an incomplete-section notice.
 
-To build with ``--catalog biso`` instead of ``--report``, first run the producer
-with ``--full`` so its manifest includes the required bibliography. The example
+To build with ``--catalog biso`` instead of ``--report``, run the producer
+with ``--full`` if you want bibliography data, and set
+``[config] include_bibliography = true`` in its manifest to print it. The example
 layout adds a numeric publication count and explicit page breaks.
 Export the catalog to customize it::
 
@@ -138,6 +139,7 @@ Open ``build/biso/report/main.tex`` and add commentary before
 ``\end{document}``. Rerun the build command: generated content updates, while
 ``main.tex`` is preserved. Avoid editing ``generated_body.tex`` or
 ``generated_variables.tex`` because they are overwritten.
+``generated_bibliography.tex`` is also regenerated from the bibliography flag.
 
 Run the live integration test with::
 
@@ -146,8 +148,8 @@ Run the live integration test with::
 It executes the same producer in a temporary directory, checks the two PDF plots
 and manifest, builds and compiles the example, adds a review comment, changes a
 statistic in its temporary test copy, and rebuilds. It checks preservation of
-``main.tex``, updated variables, ZIP contents, and rejection of catalog inputs
-without the required bibliography. Separate tests generate full producer data
+``main.tex``, updated variables, ZIP contents, and acceptance of catalog inputs
+without bibliography data. Separate tests generate full producer data
 once and compile every catalog, including the BiSO bibliography. Each producer
 subprocess has a timeout. It needs the example dependencies,
 network access, and LaTeX; service failures are reported as test failures.

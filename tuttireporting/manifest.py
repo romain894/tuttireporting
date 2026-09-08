@@ -79,6 +79,10 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
                  'tuttiGeneratedAt': tex_escape(data.get('generated_at', ''))}
     stats, config = flatten(data.get('stats', {})), flatten(data.get('config', {}))
 
+    if not isinstance(config.get('include_bibliography', False), bool):
+        raise ValueError('config.include_bibliography must be a boolean')
+    metadata['include_bibliography'] = config.get('include_bibliography', False)
+
     def macro(prefix, key, value):
         name = prefix + to_camel_case(key)
         if name in variables:
@@ -123,7 +127,8 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
     if not isinstance(files, list):
         raise ValueError('files must be an array of tables')
     reserved_destinations = {
-        'main.tex', 'generated_variables.tex', 'generated_body.tex', '.tutti-template.json',
+        'main.tex', 'generated_variables.tex', 'generated_body.tex',
+        'generated_bibliography.tex', '.tutti-template.json',
     }
     file_names, file_paths, destinations = set(), {}, {relative for _, relative in assets}
     for item in files:
@@ -136,7 +141,8 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
             raise ValueError(f'Duplicate file name: {name}')
         if (destination.is_absolute() or '..' in destination.parts or destination == Path('.')
                 or destination.as_posix() in destinations
-                or destination.as_posix() in reserved_destinations):
+                or destination.as_posix() in reserved_destinations
+                or destination.parts[0] == 'comments'):
             raise ValueError(f'Unsafe or duplicate file destination: {item["destination"]}')
         source = Path(item['path'])
         if source.is_absolute():
@@ -152,9 +158,7 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
         destinations.add(relative)
 
     bibliography = metadata.get('bibliography')
-    if bibliography is not None:
-        if bibliography not in file_paths:
-            raise ValueError(f'Report bibliography must name a manifest file: {bibliography!r}')
+    if bibliography in file_paths:
         variables['tuttiBibliographyFile'] = tex_escape(file_paths[bibliography])
 
     def select(section, field, available, failures):
@@ -211,6 +215,8 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
                 result.append(parts)
         return result
 
+    comment_ids = set()
+
     def resolve(sections, depth=0):
         if not isinstance(sections, list):
             raise ValueError('sections must be an array of tables')
@@ -221,7 +227,7 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
             _keys(section, {'title', 'text', 'new_page', 'omit_if_empty', 'missing',
                             'stats', 'config', 'plots', 'sections', 'paragraphs',
                             'figure_notes', 'after_plots', 'bullets', 'closing_paragraphs',
-                            'plot_captions'}, 'section')
+                            'plot_captions', 'reviewer_comment'}, 'section')
             if not isinstance(section.get('title'), str) or not section['title'].strip():
                 raise ValueError('Each section needs a non-empty title')
             if not isinstance(section.get('text', ''), str):
@@ -231,6 +237,22 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
                     raise ValueError(f'section.{flag} must be a boolean')
             if section.get('missing', 'omit') not in {'omit', 'error'}:
                 raise ValueError('section.missing must be "omit" or "error"')
+            comment = section.get('reviewer_comment')
+            if comment is not None:
+                _keys(comment, {'id', 'style', 'prompt'}, 'section.reviewer_comment')
+                identifier = comment.get('id')
+                if not isinstance(identifier, str) or not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', identifier):
+                    raise ValueError('reviewer_comment.id must use lowercase letters, digits, underscores or hyphens')
+                if identifier in comment_ids:
+                    raise ValueError(f'Duplicate reviewer_comment.id: {identifier}')
+                comment_ids.add(identifier)
+                style = comment.get('style', 'block')
+                if style not in ('comment', 'block'):
+                    raise ValueError('reviewer_comment.style must be "comment" or "block"')
+                prompt = comment.get('prompt', f'Comment on: {section["title"]}')
+                if not isinstance(prompt, str) or not prompt.strip():
+                    raise ValueError('reviewer_comment.prompt must be a non-empty string')
+                comment = dict(path=f'comments/{identifier}.tex', style=style, prompt=prompt)
             failures = []
             rows = []
             for field, available in [('stats', stats), ('config', config)]:
@@ -264,7 +286,7 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
                 continue
             resolved.append(dict(title=section['title'], text=section.get('text', ''),
                                  new_page=section.get('new_page', False), rows=rows, plots=figures, paragraphs=prose,
-                                 errors=failures, **extra,
+                                 errors=failures, reviewer_comment=comment, **extra,
                                  command=('section', 'subsection', 'subsubsection')[depth]))
             resolved.extend(children)
         return resolved

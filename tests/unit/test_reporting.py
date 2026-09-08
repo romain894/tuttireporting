@@ -181,9 +181,33 @@ destination = "references.bib"
         with self.assertRaisesRegex(ValueError, 'destination'):
             self.build()
 
-    def test_bibliography_requires_a_named_manifest_file(self):
+    def test_missing_bibliography_is_optional(self):
         self.layout.write_text('[report]\nbibliography = "references"\n')
-        with self.assertRaisesRegex(ValueError, 'bibliography'):
+        self.build()
+        self.assertNotIn('tuttiBibliographyFile', load_report(self.manifest, self.layout).variables)
+        self.assertIn('% \\makebiblio', (self.output / 'generated_bibliography.tex').read_text())
+
+    def test_bibliography_switch_updates_without_overwriting_main(self):
+        self.layout.write_text('[report]\nbibliography = "references"\n')
+        (self.source / 'references.bib').write_text('@book{x,title={Example}}')
+        for supplied in (True, False):
+            for flag in ('true', 'false', None):
+                with self.subTest(supplied=supplied, flag=flag):
+                    manifest = '[config]\n'
+                    if flag is not None:
+                        manifest += f'include_bibliography = {flag}\n'
+                    if supplied:
+                        manifest += ('[[files]]\nname="references"\n'
+                                     'path="references.bib"\ndestination="references.bib"\n')
+                    self.manifest.write_text(manifest)
+                    before = (self.output / 'main.tex').read_bytes() if self.output.exists() else None
+                    self.build()
+                    command = (self.output / 'generated_bibliography.tex').read_text().splitlines()[-1]
+                    self.assertEqual(command, ('' if supplied and flag == 'true' else '% ') + r'\makebiblio')
+                    if before is not None:
+                        self.assertEqual(before, (self.output / 'main.tex').read_bytes())
+        self.manifest.write_text('[config]\ninclude_bibliography = "true"\n')
+        with self.assertRaisesRegex(ValueError, 'must be a boolean'):
             self.build()
 
     def test_symlink_output_rejected(self):

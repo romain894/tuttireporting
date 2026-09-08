@@ -51,4 +51,8 @@ Parameter / statistic & Value \\
 \VAR{prose(paragraph)}\par
 
 \BLOCK{endfor}
+\BLOCK{if section.reviewer_comment}
+% Reviewer commentary: edit the preserved file below.
+\input{\VAR{section.reviewer_comment.path}}
+\BLOCK{endif}
 \BLOCK{endfor}

@@ -28,7 +28,13 @@ def full_manifest(tmp_path_factory):
     assert result.returncode == 0, result.stdout + result.stderr
     bibliography = data / 'plots/works_bibtex.bib'
     assert bibliography.is_file() and bibliography.stat().st_size > 0, result.stdout + result.stderr
-    return data / 'manifest.toml'
+    import tomli_w
+    from tuttireporting.manifest import read_toml
+    manifest = data / 'manifest.toml'
+    content = read_toml(manifest)
+    content.setdefault('config', {})['include_bibliography'] = True
+    manifest.write_text(tomli_w.dumps(content), encoding='utf-8')
+    return manifest
 
 
 @pytest.mark.parametrize('catalog', list_reports())

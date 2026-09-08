@@ -43,10 +43,23 @@ the report definition declares the file by name::
     [report]
     bibliography = "references"
 
-This produces the standard ``\tuttiBibliographyFile`` macro. Bundled BiSO,
-PubPart, and article starters load it with ``biblatex`` and print every entry.
+When the named asset is supplied, this produces ``\tuttiBibliographyFile``.
+To include the bibliography in the PDF, also set this boolean in the manifest::
+
+    [config]
+    include_bibliography = true
+
+The default is false. The article and BiSO starters print every entry only when
+both the named asset is supplied and this flag is true. Otherwise,
+``generated_bibliography.tex`` contains a commented ``% \makebiblio`` command.
+The asset is still copied, so you can uncomment the command before compiling
+manually. A subsequent build regenerates this file from the configuration.
+Existing ``main.tex`` files are preserved: use a fresh output directory to adopt
+the updated starter, or copy its bibliography setup and generated-file input
+into your existing main file.
 Destinations cannot escape the generated project or replace its machine-managed
-files. A declared bibliography must name a supplied manifest file.
+files. An absent named bibliography asset simply omits the bibliography.
+An explicitly listed ``[[files]]`` source must still exist.
 
 Report definition
 -----------------------
