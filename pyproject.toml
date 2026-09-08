@@ -34,6 +34,14 @@ dev = ["pytest>=8,<9"]
 [tool.setuptools]
 include-package-data = true
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "pdf: offline tests requiring LaTeX tools",
+    "live: integration tests requiring network access and example dependencies",
+]
+
 [tool.setuptools.packages.find]
 include = ["tuttireporting*"]
 

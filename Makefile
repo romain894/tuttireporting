@@ -1,65 +1,41 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
+PYTEST_ARGS ?=
 BISO_ENTITY ?= UNIV-PARIS-SACLAY
 BISO_YEAR ?= 2024
 BISO_BIBLIOGRAPHY_LIMIT ?= 100
 SPHINXOPTS ?=
 
 .DEFAULT_GOAL := help
-.PHONY: help test test-unit test-live test-live-biso test-biso example example-biso \
-	test-catalogs test-catalogs-pdf test-reports test-reports-pdf docs doc clean
-
-define build_test_reports
-	rm -rf build/test-reports
-	$(PYTHON) examples/biso/produce.py --full --entity-id "$(BISO_ENTITY)" --year "$(BISO_YEAR)" --bibliography-limit "$(BISO_BIBLIOGRAPHY_LIMIT)" --output build/test-reports/data
-	test -s build/test-reports/data/plots/works_bibtex.bib
-	$(PYTHON) -m tuttireporting build --manifest build/test-reports/data/manifest.toml --catalog biso --output build/test-reports/biso $(1)
-	test -s build/test-reports/biso/references.bib
-	$(PYTHON) -m tuttireporting build --manifest build/test-reports/data/manifest.toml --catalog pubpart --output build/test-reports/pubpart $(1)
-endef
+.PHONY: help test test-pdf test-live test-all example docs clean
 
 help:
-	@echo "make test                 Run the Python test suite"
-	@echo "make test-live            Run all live integration tests"
-	@echo "make test-live-biso       Test the live BiSO example (HAL and LaTeX required)"
-	@echo "make example              Generate all documented examples"
-	@echo "make example-biso         Generate the BiSO example under build/biso"
-	@echo "make test-catalogs        Generate all catalog layouts from full producer data"
-	@echo "make test-catalogs-pdf    Compile catalog layouts and verify the BiSO bibliography"
-	@echo "make docs   Build HTML documentation in docs/html"
-	@echo "make clean  Remove the build directory, documentation output, and Python caches"
+	@echo "make test       Run the fast offline tests"
+	@echo "make test-pdf   Run offline tests including LaTeX compilation"
+	@echo "make test-live  Run live producer and catalog integration tests"
+	@echo "make test-all   Run all tests, including PDF and live integration tests"
+	@echo "make example    Generate the BiSO example under build/biso"
+	@echo "make docs       Build HTML documentation in docs/html"
+	@echo "make clean      Remove build outputs and Python caches"
+	@echo "Use PYTEST_ARGS='...' to pass pytest options to any test command"
 
-test: test-unit
+test:
+	$(PYTHON) -m pytest $(PYTEST_ARGS)
 
-test-unit:
-	$(PYTHON) -m pytest tests --ignore=tests/integration -v
+test-pdf:
+	$(PYTHON) -m pytest --run-pdf $(PYTEST_ARGS)
 
-test-live: test-live-biso
+test-live:
+	BISO_ENTITY="$(BISO_ENTITY)" BISO_YEAR="$(BISO_YEAR)" BISO_BIBLIOGRAPHY_LIMIT="$(BISO_BIBLIOGRAPHY_LIMIT)" $(PYTHON) -m pytest --run-live -m live $(PYTEST_ARGS)
 
-test-live-biso:
-	BISO_ENTITY="$(BISO_ENTITY)" BISO_YEAR="$(BISO_YEAR)" $(PYTHON) -m unittest discover -s tests/integration -v
+test-all:
+	BISO_ENTITY="$(BISO_ENTITY)" BISO_YEAR="$(BISO_YEAR)" BISO_BIBLIOGRAPHY_LIMIT="$(BISO_BIBLIOGRAPHY_LIMIT)" $(PYTHON) -m pytest --run-pdf --run-live $(PYTEST_ARGS)
 
-test-biso: test-live-biso
-
-example: example-biso
-
-example-biso:
+example:
 	$(PYTHON) examples/biso/produce.py --entity-id "$(BISO_ENTITY)" --year "$(BISO_YEAR)"
 	$(PYTHON) -m tuttireporting build --manifest build/biso/data/manifest.toml --report examples/biso/report.toml --output build/biso/report --compile --zip
 
-test-catalogs:
-	$(call build_test_reports)
-
-test-catalogs-pdf:
-	$(call build_test_reports,--compile)
-
-test-reports: test-catalogs
-
-test-reports-pdf: test-catalogs-pdf
-
 docs:
 	$(PYTHON) -m sphinx -M html sphinx-doc docs $(SPHINXOPTS)
-
-doc: docs
 
 clean:
 	rm -rf build

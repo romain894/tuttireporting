@@ -32,14 +32,14 @@ The resulting PDF is `build/biso/report/main.pdf`; the editable archive is
 `build/biso/report.zip`. Add commentary inside `main.tex`, before
 `\end{document}`, and rerun only the build command to preserve it.
 
-The full catalog also accepts the same data: replace
-`--report examples/biso/report.toml` with `--catalog biso`. Sections without
-matching data disappear. The layouts present statistics in French sentences with
+For the full catalog, run the producer with `--full` to include its required
+bibliography, then replace `--report examples/biso/report.toml` with
+`--catalog biso`. The layouts present statistics in French sentences with
 bold inline values, using `paragraphs` references such as `{{stats.publications}}`.
 The example layout uses explicit page breaks and requires its referenced data.
 
-Use `make example-biso` as a shortcut for the producer and build commands above,
-or `make test-biso` to execute the same producer and test compilation and
+Use `make example` as a shortcut for the producer and build commands above,
+or `make test-live` to execute the same producer and test compilation and
 regeneration in a temporary directory. The regular `make test` does not query HAL.
 
 The Sphinx walkthrough includes `produce.py` and `report.toml` directly, so the

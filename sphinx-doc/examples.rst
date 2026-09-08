@@ -113,10 +113,10 @@ The parent section groups two subsections. ``new_page`` controls page breaks.
 ``missing = "error"`` marks missing data in this example, so a failed
 producer leaves its section visible with an incomplete-section notice.
 
-You can also build these inputs using ``--catalog biso`` instead of ``--report``.
-The bundled layout omits unpopulated sections, such as collaborations and research
-projects. The example layout adds a numeric publication count and explicit page
-breaks. Export the catalog to customize it::
+To build with ``--catalog biso`` instead of ``--report``, first run the producer
+with ``--full`` so its manifest includes the required bibliography. The example
+layout adds a numeric publication count and explicit page breaks.
+Export the catalog to customize it::
 
     tuttireporting catalog export biso --output my-biso
 
@@ -146,8 +146,10 @@ Run the live integration test with::
 It executes the same producer in a temporary directory, checks the two PDF plots
 and manifest, builds and compiles the example, adds a review comment, changes a
 statistic in its temporary test copy, and rebuilds. It checks preservation of
-``main.tex``, updated variables, ZIP contents, and omission of absent catalog
-sections. Each subprocess has a timeout. It needs the example dependencies,
+``main.tex``, updated variables, ZIP contents, and rejection of catalog inputs
+without the required bibliography. Separate tests generate full producer data
+once and compile every catalog, including the BiSO bibliography. Each producer
+subprocess has a timeout. It needs the example dependencies,
 network access, and LaTeX; service failures are reported as test failures.
 
 ``make test`` remains the fast offline suite. ``make docs`` includes the example

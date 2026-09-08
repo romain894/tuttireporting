@@ -13,7 +13,7 @@ from tuttireporting.cli import main
 from tuttireporting.manifest import load_report
 from tuttireporting.templating import tex_escape, to_camel_case
 
-FIXTURE = Path(__file__).parent / 'fixtures' / 'report'
+FIXTURE = Path(__file__).parents[1] / 'fixtures' / 'report'
 
 
 class ReportingTests(unittest.TestCase):

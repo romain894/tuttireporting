@@ -1,8 +1,6 @@
-"""Live integration check for the documented BiSO example; run with make test-biso."""
-import importlib.util
+"""Live integration check for the documented BiSO example; run with make test-live."""
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -16,13 +14,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class BisoExampleTest(unittest.TestCase):
     def test_live_producer_build_and_edit_preservation(self):
-        for module in ('dibisoplot', 'tomli_w'):
-            if importlib.util.find_spec(module) is None:
-                self.fail('Install examples/biso/requirements.txt before running make test-biso')
-        for command in ('latexmk', 'lualatex'):
-            if shutil.which(command) is None:
-                self.fail(f'{command} is required for make test-biso')
-
         def run(*args):
             result = subprocess.run([sys.executable, *map(str, args)], cwd=ROOT,
                                     capture_output=True, text=True, timeout=240)
@@ -74,13 +65,15 @@ class BisoExampleTest(unittest.TestCase):
                 self.assertEqual(archive.read('main.tex'), before[0])
                 self.assertIn('plots/OpenAccessWorks.pdf', archive.namelist())
 
-            # The same producer output can be passed to the complete catalog;
-            # missing topics must disappear rather than leave empty sections.
-            run('-m', 'tuttireporting', 'build', '--manifest', manifest_path,
-                '--catalog', 'biso', '--output', root / 'catalog')
-            catalog_body = (root / 'catalog/generated_body.tex').read_text()
-            self.assertIn('Accès ouvert', catalog_body)
-            self.assertNotIn('Collaborations internationales', catalog_body)
+            # The full catalog requires bibliography data that the small
+            # example does not produce. Full builds are covered in test_catalogs.
+            result = subprocess.run(
+                [sys.executable, '-m', 'tuttireporting', 'build', '--manifest',
+                 str(manifest_path), '--catalog', 'biso', '--output', str(root / 'catalog')],
+                cwd=ROOT, capture_output=True, text=True, timeout=240,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Report bibliography must name a manifest file: 'references'", result.stderr)
 
 
 if __name__ == '__main__':

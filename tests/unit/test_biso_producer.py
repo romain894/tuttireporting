@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 
 
-PRODUCER = runpy.run_path(str(Path(__file__).parents[1] / 'examples' / 'biso' / 'produce.py'))
+PRODUCER = runpy.run_path(str(Path(__file__).parents[2] / 'examples' / 'biso' / 'produce.py'))
 
 
 class BisoProducerTests(unittest.TestCase):

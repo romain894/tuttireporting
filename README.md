@@ -29,7 +29,7 @@ With Python 3.10+, a virtual environment, and LuaLaTeX/latexmk installed:
 ```bash
 pip install -e .
 pip install -r examples/biso/requirements.txt
-make example-biso
+make example
 ```
 
 This uses dibisoplot to query HAL for two BiSO figures: publication types and
@@ -69,13 +69,11 @@ roles, the generated directory, the execution path, and where to make changes.
 Then read the [BiSO example](sphinx-doc/examples.rst), [TOML format](sphinx-doc/settings.rst),
 and [Python API](sphinx-doc/reference/index.rst).
 
-- `make test`: Python test suite; install it with `pip install -e '.[dev]'`.
-- `make test-live`: all live integration tests; currently the documented BiSO producer.
-- `make example`: all documented examples; currently BiSO.
-- `make test-catalogs`: generate every catalog layout from full producer data.
-- `make test-catalogs-pdf`: generate and compile all catalog layouts with their default
-  templates, including the full BiSO bibliography; unavailable visualizations
-  appear as section failure notices.
+- `make test`: fast offline tests; install with `pip install -e '.[dev]'`.
+- `make test-pdf`: offline tests plus LaTeX/BibLaTeX compilation.
+- `make test-live`: live BiSO example and full catalog compilation, including bibliography.
+- `make test-all`: the complete suite, including offline, PDF, and live tests.
+- `make example`: generate the BiSO example under `build/biso`.
 - `make docs`: build documentation, including the example's actual source files.
 - `make clean`: remove build outputs and caches, including the generated example.
 
@@ -86,4 +84,10 @@ builder does not execute them.
 
 The full producer writes at most 100 BibTeX entries by default, because larger
 bibliographies can make LaTeX compilation impractical. Override the limit for a
-catalog test with `make test-catalogs-pdf BISO_BIBLIOGRAPHY_LIMIT=200`.
+catalog test with `make test-live BISO_BIBLIOGRAPHY_LIMIT=200`.
+
+All checks use pytest, organized under `tests/unit`, `tests/pdf`, and `tests/live`,
+with shared data in `tests/fixtures`. Plain `python -m pytest` runs the offline
+unit suite; opt in with `--run-pdf` or `--run-live`. Pass filters through Make,
+for example `make test PYTEST_ARGS='-k catalog'`. See the
+[development guide](sphinx-doc/development.rst) for prerequisites and selection.
