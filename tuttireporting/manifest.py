@@ -58,11 +58,11 @@ def _keys(value: dict, allowed: set, context: str):
 def load_report(manifest_path: str | Path, report_path: str | Path | None = None) -> Report:
     manifest_path = Path(manifest_path).resolve()
     data = read_toml(manifest_path)
-    _keys(data, {'generated_at', 'stats', 'config', 'items', 'report', 'sections'}, 'manifest')
+    _keys(data, {'generated_at', 'stats', 'config', 'items', 'files', 'report', 'sections'}, 'manifest')
     definition = read_toml(report_path) if report_path else data
     if report_path:
         _keys(definition, {'report', 'sections'}, 'report definition')
-    _keys(definition.get('report', {}), {'title', 'author', 'template'}, 'report')
+    _keys(definition.get('report', {}), {'title', 'author', 'template', 'bibliography'}, 'report')
     metadata = dict(definition.get('report', {}))
     if not isinstance(data.get('generated_at', ''), (str, datetime)):
         raise ValueError('generated_at must be a string or TOML datetime')
@@ -115,6 +115,44 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
         plots[key] = {'path': relative, 'caption': item.get('caption', key)}
         if key not in plot_errors:
             assets.append((source, relative))
+
+    files = data.get('files', [])
+    if not isinstance(files, list):
+        raise ValueError('files must be an array of tables')
+    reserved_destinations = {
+        'main.tex', 'generated_variables.tex', 'generated_body.tex', '.tutti-template.json',
+    }
+    file_names, file_paths, destinations = set(), {}, {relative for _, relative in assets}
+    for item in files:
+        _keys(item, {'name', 'path', 'destination'}, 'file')
+        if any(not isinstance(item.get(key), str) or not item[key]
+               for key in ('name', 'path', 'destination')):
+            raise ValueError('Each file requires non-empty name, path, and destination strings')
+        name, destination = item['name'], Path(item['destination'])
+        if name in file_names:
+            raise ValueError(f'Duplicate file name: {name}')
+        if (destination.is_absolute() or '..' in destination.parts or destination == Path('.')
+                or destination.as_posix() in destinations
+                or destination.as_posix() in reserved_destinations):
+            raise ValueError(f'Unsafe or duplicate file destination: {item["destination"]}')
+        source = Path(item['path'])
+        if source.is_absolute():
+            raise ValueError(f'File path must be relative to the manifest: {source}')
+        source = (manifest_path.parent / source).resolve()
+        if not source.is_relative_to(manifest_path.parent) or not source.is_file():
+            raise ValueError(f'File does not exist within the manifest directory: {item["path"]}')
+        relative = destination.as_posix()
+        macro('tuttiFile', name, tex_escape(relative))
+        assets.append((source, relative))
+        file_names.add(name)
+        file_paths[name] = relative
+        destinations.add(relative)
+
+    bibliography = metadata.get('bibliography')
+    if bibliography is not None:
+        if bibliography not in file_paths:
+            raise ValueError(f'Report bibliography must name a manifest file: {bibliography!r}')
+        variables['tuttiBibliographyFile'] = tex_escape(file_paths[bibliography])
 
     def select(section, field, available, failures):
         selectors = section.get(field, [])

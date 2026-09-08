@@ -1,19 +1,34 @@
 % Human-owned after the first build. Adapter for an untouched DiBISO release.
 \documentclass[french,11pt]{dibiso/pubpart}
 \input{generated_variables.tex}
+\usepackage{biblatex}
+\setlength{\bibitemsep}{6pt}
 \title{Publications \\ \& \\ Partenariats}
-\subtitle{\tuttiReportTitle}
-\titledescription{\tuttiReportAuthor}
-\reporter{\tuttiReportAuthor}
+\subtitle{\textbf{\ifdefined\tuttiCfgEntitiesAcronym\tuttiCfgEntitiesAcronym\fi} \\
+  \medskip
+  \ifdefined\tuttiCfgEntitiesFullName\tuttiCfgEntitiesFullName\fi}
+\titledescription{\textbf{\Large Liste des travaux} \\
+  \medskip
+  \large Ce document contient la liste des co-publications de
+  \ifdefined\tuttiCfgEntitiesFullName\tuttiCfgEntitiesFullName\fi
+  pour la période \ifdefined\tuttiCfgYear\tuttiCfgYear\fi
+  \ifdefined\tuttiCfgDataFetchDate\ au \tuttiCfgDataFetchDate\fi,
+  utilisés pour réaliser le rapport Publications \& Partenariats.}
+\ifdefined\tuttiBibliographyFile
+  \addbibresource{\tuttiBibliographyFile}
+\fi
 \ifdefined\tuttiCfgYear
-  \date{Année \tuttiCfgYear}
+  \date{\tuttiCfgYear}
 \else
   \date{}
 \fi
 \begin{document}
 \maketitle
 \input{generated_body.tex}
-\clearpage
-\section*{Commentaires}
-% Add interpretation, discussion, and review notes here.
+\ifdefined\tuttiBibliographyFile
+  \nocite{*}
+  {\footnotesize\printbibliography}
+  \medskip
+  \makelastpagebiblio
+\fi
 \end{document}

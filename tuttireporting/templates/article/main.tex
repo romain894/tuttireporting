@@ -1,12 +1,20 @@
 % Human-owned: tuttireporting never overwrites this file.
 \documentclass{tutti/report}
 \input{generated_variables.tex}
+\ifdefined\tuttiBibliographyFile
+  \usepackage{biblatex}
+  \addbibresource{\tuttiBibliographyFile}
+\fi
 \title{\tuttiReportTitle}
 \author{\tuttiReportAuthor}
 \date{\tuttiGeneratedAt}
 \begin{document}
 \maketitle
 \input{generated_body.tex}
+\ifdefined\tuttiBibliographyFile
+  \nocite{*}
+  \printbibliography
+\fi
 \clearpage
 \section*{Commentary}
 % Add interpretation, discussion, and review notes here.

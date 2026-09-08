@@ -58,7 +58,14 @@ class CatalogTests(unittest.TestCase):
             self.assertEqual(exported.read_bytes(), before)
             self.assertTrue((root / 'definition/producer.toml').is_file())
             manifest = root / 'manifest.toml'
-            manifest.write_text('[stats]\noaworksperiod="2020–2024"\n')
+            (root / 'references.bib').write_text('@book{example, title={Example}}\n')
+            manifest.write_text('''[stats]
+oaworksperiod="2020–2024"
+[[files]]
+name="references"
+path="references.bib"
+destination="references.bib"
+''')
             for name in list_reports():
                 build_project(root / name, manifest, catalog_name=name, template_name='article')
             body = (root / 'biso/generated_body.tex').read_text()

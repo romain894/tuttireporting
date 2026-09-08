@@ -155,6 +155,37 @@ paragraphs=["Drop {{config.absent}}."]
         with self.assertRaisesRegex(ValueError, 'Duplicate'):
             self.build()
 
+    def test_manifest_files_are_copied_and_exposed_as_macros(self):
+        (self.source / 'references.bib').write_text('@book{example, title={Example}}\n')
+        self.manifest.write_text(self.manifest.read_text() + '''
+[[files]]
+name = "references"
+path = "references.bib"
+destination = "references.bib"
+''')
+        self.layout.write_text(self.layout.read_text().replace(
+            'template = "article"', 'template = "article"\nbibliography = "references"'))
+        self.build()
+        self.assertEqual((self.output / 'references.bib').read_text(),
+                         '@book{example, title={Example}}\n')
+        self.assertIn(r'\newcommand{\tuttiFileReferences}{references.bib}',
+                      (self.output / 'generated_variables.tex').read_text())
+        self.assertIn(r'\newcommand{\tuttiBibliographyFile}{references.bib}',
+                      (self.output / 'generated_variables.tex').read_text())
+        self.manifest.write_text(self.manifest.read_text().replace('destination = "references.bib"',
+                                                                     'destination = "../references.bib"'))
+        with self.assertRaisesRegex(ValueError, 'destination'):
+            self.build()
+        self.manifest.write_text(self.manifest.read_text().replace('destination = "../references.bib"',
+                                                                     'destination = "main.tex"'))
+        with self.assertRaisesRegex(ValueError, 'destination'):
+            self.build()
+
+    def test_bibliography_requires_a_named_manifest_file(self):
+        self.layout.write_text('[report]\nbibliography = "references"\n')
+        with self.assertRaisesRegex(ValueError, 'bibliography'):
+            self.build()
+
     def test_symlink_output_rejected(self):
         self.output.mkdir()
         (self.output / 'plots').symlink_to(self.source / 'plots', target_is_directory=True)

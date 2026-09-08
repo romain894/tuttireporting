@@ -18,10 +18,10 @@ From the repository root, with a virtual environment activated::
 
     pip install -e .
     pip install -r examples/biso/requirements.txt
-    make example-biso
+    make example
 
 This uses the HAL collection ``UNIV-PARIS-SACLAY`` and publication year 2024.
-Override them with ``make example-biso BISO_ENTITY=YOUR_COLLECTION BISO_YEAR=2023``.
+Override them with ``make example BISO_ENTITY=YOUR_COLLECTION BISO_YEAR=2023``.
 Use a HAL collection identifier, not an OpenAlex identifier or a laboratory name.
 
 The example requires network access to HAL and LuaLaTeX/latexmk for compilation.
@@ -40,7 +40,7 @@ to dibisoplot figures; the fetched counts are unchanged. It needs no OpenAlex or
 The two stages
 --------------------
 
-``make example-biso`` runs these commands::
+``make example`` runs these commands::
 
     python examples/biso/produce.py --entity-id UNIV-PARIS-SACLAY --year 2024
     tuttireporting build --manifest build/biso/data/manifest.toml --report examples/biso/report.toml --output build/biso/report --compile --zip
@@ -126,8 +126,10 @@ execute that larger plotting recipe. The example and the BiSO catalog select the
 from v0.10.1. Its first use downloads and caches the template archive. A local
 ZIP can be supplied with ``--template-source``; see :doc:`templates`. To switch
 from an earlier generated article project, use a fresh output directory, since
-its existing ``main.tex`` is preserved. Raw TeX tables and BibTeX bibliography
-assembly remain unsupported.
+its existing ``main.tex`` is preserved. A catalog can declare a named manifest
+file as its BibLaTeX bibliography; the full BiSO producer exports
+``works_bibtex.bib`` as that file. It limits that bibliography to 100 entries
+by default, because larger lists can make LaTeX compilation slow.
 
 Editing and testing the report
 ------------------------------------
@@ -139,7 +141,7 @@ Open ``build/biso/report/main.tex`` and add commentary before
 
 Run the live integration test with::
 
-    make test-biso
+    make test-live
 
 It executes the same producer in a temporary directory, checks the two PDF plots
 and manifest, builds and compiles the example, adds a review comment, changes a

@@ -49,6 +49,6 @@ oa_works_period = "oaworksperiod"
 max_plotted_entities = 35
 
 [[visualizations.WorksBibtex]]
-max_plotted_entities = 1000
+max_plotted_entities = 100
 
 [[visualizations.WorksType]]

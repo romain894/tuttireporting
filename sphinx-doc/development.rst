@@ -27,8 +27,8 @@ The executable example lives in ``examples/biso/produce.py``. Sphinx includes
 that file and ``report.toml`` with ``literalinclude``, so edits appear in the
 walkthrough without copying code into documentation or a notebook.
 
-Install ``examples/biso/requirements.txt`` and run ``make test-biso`` to test
+Install ``examples/biso/requirements.txt`` and run ``make test-live`` to test
 the live producer, compilation, ZIP export, and regeneration. These checks live
 under ``tests/integration`` and run separately from the offline suite. Run
-``make example-biso`` to keep the generated report under ``build/biso`` for
+``make example`` to keep the generated report under ``build/biso`` for
 manual inspection. Both commands accept ``BISO_ENTITY`` and ``BISO_YEAR``.

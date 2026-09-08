@@ -2,6 +2,7 @@
 [report]
 title = "Publications et partenariats"
 template = "pubpart"
+author = "Direction des bibliothèques, de l'information et de la science ouverte"
 
 [[sections]]
 title = "Périmètre du rapport"

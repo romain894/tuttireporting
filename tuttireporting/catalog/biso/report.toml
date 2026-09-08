@@ -3,6 +3,7 @@
 title = "Bilan de science ouverte"
 template = "biso"
 author = "Direction des bibliothèques, de l'information et de la science ouverte"
+bibliography = "references"
 
 [[sections]]
 title = "Liste des revues"

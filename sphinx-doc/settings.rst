@@ -24,6 +24,30 @@ keys with dotted names. Figure paths must stay inside the manifest directory;
 supported formats are PDF, PNG, and JPEG. ``generated_at`` is supplied by the
 producer, not updated by the builder.
 
+Supporting files
+~~~~~~~~~~~~~~~~
+
+Use ``files`` for a producer output that is not a figure, such as a BibLaTeX
+bibliography. The source stays inside the manifest directory and the builder
+copies it to the requested relative destination::
+
+    [[files]]
+    name = "references"
+    path = "references.bib"
+    destination = "references.bib"
+
+Each file name creates a macro from ``\tuttiFile`` plus its CamelCase name:
+the example creates ``\tuttiFileReferences``. To render it as a bibliography,
+the report definition declares the file by name::
+
+    [report]
+    bibliography = "references"
+
+This produces the standard ``\tuttiBibliographyFile`` macro. Bundled BiSO,
+PubPart, and article starters load it with ``biblatex`` and print every entry.
+Destinations cannot escape the generated project or replace its machine-managed
+files. A declared bibliography must name a supplied manifest file.
+
 Report definition
 -----------------------
 
