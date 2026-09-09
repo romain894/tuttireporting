@@ -9,16 +9,19 @@ bibliography = "references"
 title = "Liste des revues"
 reviewer_comment = {id = "journals", style = "block", prompt = "Écrire un commentaire sur la liste des revues dans HAL ci-dessous :"}
 plots = ["journals_hal"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Liste des conférences"
 new_page = true
 plots = ["conferences"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Liste des chapitres"
 new_page = true
 plots = ["chapters"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Typologie de la production scientifique"
@@ -26,6 +29,7 @@ reviewer_comment = {id = "works-type", style = "block", prompt = "Écrire un com
 new_page = true
 paragraphs = ["Le corpus comprend {{stats.publications}} publications."]
 plots = ["works_type"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Articles et Communications de congrès en accès ouvert"
@@ -33,6 +37,7 @@ reviewer_comment = {id = "open-access", style = "block", prompt = "Écrire un co
 new_page = true
 paragraphs = ["L’évolution de l’accès ouvert est présentée sur la période {{stats.oaworksperiod}}."]
 plots = ["open_access_works"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Liste des revues et les voies d'accès ouvert repérés dans le BSO"
@@ -43,37 +48,44 @@ paragraphs = [
   "Le corpus couvre {{stats.bsojournalsnbjournals}} revues (version {{stats.bsojournalsbsoversion}}).",
 ]
 plots = ["journals", "journals_hal"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Carte des collaborations internationales"
 new_page = true
 paragraphs = ["{{stats.collaborationsnb}} collaborations concernent {{stats.institutionsnb}} institutions dans {{stats.countriesnb}} pays."]
 plots = ["collaboration_map_world"]
+plot_layout = {width = 1.2, x_offset = -0.1, placement = "!htbp"}
 
 [[sections]]
 title = "Carte des collaborations Européennes"
 new_page = true
 plots = ["collaboration_map_europe"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Collaborations internationales par établissements"
 new_page = true
 plots = ["collaboration_names"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Collaborations avec le secteur privé"
 reviewer_comment = {id = "private-collaborations", style = "block", prompt = "Écrire un commentaire sur les collaborations avec le secteur privé ci-dessous :"}
 new_page = true
 plots = ["private_sector_collaborations"]
+plot_layout = {width = 1.0, placement = "!htbp"}
 
 [[sections]]
 title = "Publications liées à des projets européens"
 new_page = true
 plots = ["european_projects"]
+plot_layout = {width = 0.85, placement = "!htbp"}
 
 [[sections]]
 title = "Publications liées à des projets ANR"
 plots = ["anr_projects"]
+plot_layout = {width = 0.85, placement = "!htbp"}
 
 [[sections]]
 title = "Jeux de données partagés"

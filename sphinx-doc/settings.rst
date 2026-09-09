@@ -104,6 +104,35 @@ Explicit ``stats`` and ``config`` selectors produce two-column tables. Prefer
 not also select it for a table. Unknown fields and invalid types are rejected.
 Text values are escaped for LaTeX.
 
+Figure dimensions
+~~~~~~~~~~~~~~~~~
+
+An optional section-level ``plot_layout`` table controls its figures::
+
+    [[sections]]
+    title = "Collaborations internationales par établissements"
+    plots = ["collaboration_names"]
+    plot_layout = {width = 1.0}
+
+``width`` is a fraction of the line width. Optional ``height`` caps the figure
+at a fraction of the text height while preserving its aspect ratio.
+``x_offset`` shifts the figure horizontally by a fraction of the line width.
+Dimensions must be finite numbers; width and height must be positive.
+``placement`` accepts LaTeX float positions (``htbp`` by default); BiSO uses
+``!htbp`` so dense charts can stay with their section heading.
+Without ``plot_layout``, figures retain the generic 0.95 line-width / 0.72
+text-height limits. An explicit table defaults to full width with no height cap.
+
+The BiSO catalog restores the original full-width figures, the world map at
+1.2 line widths with a -0.1 offset, and project charts at 0.85 line widths.
+These LaTeX dimensions scale the exported PDF; they cannot recover labels
+omitted during plotting. The example producer uses dynamic height for horizontal
+bar charts (25 pixels per bar, up to 40 institutions), at 800 pixels wide,
+and explicitly displays every category label. France is excluded from the
+international institution chart. The two overview plots keep their custom sizing.
+Regenerate plots to update their labels. Build into a fresh output directory
+or edit preserved ``main.tex`` to adopt changed LaTeX dimensions.
+
 Reviewer comment areas
 ~~~~~~~~~~~~~~~~~~~~~~
 

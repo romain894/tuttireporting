@@ -73,6 +73,28 @@ class ReportingTests(unittest.TestCase):
         self.assertIn('Report section incomplete', body)
         self.assertIn('Missing stats key', body)
 
+    def test_plot_layout_controls_width_height_and_offset(self):
+        self.layout.write_text('[[sections]]\ntitle="Map"\nplots=["score2"]\n'
+                               'plot_layout={width=1.2, x_offset=-0.1}\n')
+        self.build()
+        main = (self.output / 'main.tex').read_text()
+        self.assertIn(r'\hspace*{-0.1\linewidth}', main)
+        self.assertIn(r'\includegraphics[width=1.2\linewidth]', main)
+        self.assertNotIn('height=0.72', main)
+        self.layout.write_text(self.layout.read_text().replace(
+            'width=1.2, x_offset=-0.1', 'width=0.85, height=0.6'))
+        self.build()
+        self.assertIn(r'width=0.85\linewidth,height=0.6\textheight,keepaspectratio',
+                      (self.output / 'generated_body.tex').read_text())
+        for invalid in ('{width=0}', '{height=-1}', '{width=true}',
+                        '{width="1.0"}', '{x_offset=nan}', '{unknown=1}', '{placement=1}',
+                        '{placement="invalid"}', '[]'):
+            with self.subTest(layout=invalid):
+                self.layout.write_text('[[sections]]\ntitle="Plot"\n'
+                                       f'plot_layout={invalid}\n')
+                with self.assertRaises(ValueError):
+                    self.build()
+
     def test_missing_plot_is_reported_and_later_recovers(self):
         self.manifest.write_text(self.manifest.read_text().replace('plots/score2.pdf', 'plots/missing.pdf'))
         self.build()

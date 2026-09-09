@@ -2,6 +2,10 @@
 # Reference for data producers; not executed by tuttireporting.
 [defaults]
 plot_main_color = "#004e7d"
+width = 800
+height = 600
+dynamic_height = true
+dynamic_height_per_bar = 25
 
 [[visualizations.AnrProjects]]
 max_plotted_entities = 20

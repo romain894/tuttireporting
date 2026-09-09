@@ -64,6 +64,14 @@ def bibliography_text(entries: dict) -> str:
     return '\n\n'.join(output) + ('\n' if output else '')
 
 
+def make_visualization(cls, entity_id, year, **extra):
+    """Keep dibisoplot's dynamic sizing for dense horizontal bar charts."""
+    parameters = dict(entity_id=entity_id, year=year, language='fr',
+                      main_color='#004e7d', width=800, height=600,
+                      dynamic_height=True)
+    return cls(**(parameters | extra))
+
+
 def produce(entity_id: str, year: int, output: Path, full: bool = False,
             bibliography_limit: int = DEFAULT_BIBLIOGRAPHY_LIMIT) -> Path:
     if bibliography_limit < 1:
@@ -72,21 +80,18 @@ def produce(entity_id: str, year: int, output: Path, full: bool = False,
     plots = output / 'plots'
     plots.mkdir(exist_ok=True)
 
-    # Both plots use HAL; no scanR credentials or OpenAlex queries are needed.
-    parameters = dict(entity_id=entity_id, year=year, language='fr',
-                      main_color='#004e7d', width=900, height=450,
-                      dynamic_height=False)
     def make(cls, **extra):
-        return cls(**parameters, **extra)
-    definitions = [('works_type', lambda: make(WorksType), f'Types de publications, {year}'),
-                   ('open_access_works', lambda: make(OpenAccessWorks), f'Accès ouvert, {year - 4} - {year}')]
+        return make_visualization(cls, entity_id, year, **extra)
+    definitions = [('works_type', lambda: make(WorksType, width=900), f'Types de publications, {year}'),
+                   ('open_access_works', lambda: make(OpenAccessWorks, width=900, height=450,
+                                                    dynamic_height=False), f'Accès ouvert, {year - 4} - {year}')]
     if full:
         definitions += [
             ('anr_projects', lambda: make(AnrProjects, max_plotted_entities=20), 'Projets ANR'),
             ('chapters', lambda: make(Chapters), 'Chapitres d’ouvrages'),
-            ('collaboration_map_world', lambda: make(CollaborationMap, name='world'), 'Collaborations internationales'),
+            ('collaboration_map_world', lambda: make(CollaborationMap, name='world', countries_to_ignore=['France']), 'Collaborations internationales'),
             ('collaboration_map_europe', lambda: make(CollaborationMap, name='europe', resolution=50, map_zoom=True), 'Collaborations en Europe'),
-            ('collaboration_names', lambda: make(CollaborationNames, max_plotted_entities=40), 'Partenaires principaux'),
+            ('collaboration_names', lambda: make(CollaborationNames, max_plotted_entities=40, countries_to_exclude=['fr']), 'Partenaires principaux'),
             ('conferences', lambda: make(Conferences, max_plotted_entities=40), 'Conférences'),
             ('european_projects', lambda: make(EuropeanProjects, max_plotted_entities=20), 'Projets européens'),
             ('journals', lambda: make(Journals), 'Revues de publication'),
@@ -127,9 +132,10 @@ def produce(entity_id: str, year: int, output: Path, full: bool = False,
                 for trace in figure.data:
                     trace.update(text=trace.y, textposition='inside', textfont_color='black')
                 stats['oaworksperiod'] = results[name]['oa_works_period']
-            else:
-                figure.update_layout(font_size=18)
             if extension != 'bib':
+                if visualization.orientation == 'h':
+                    # Plotly otherwise skips category labels on dense axes.
+                    figure.update_yaxes(tickmode='linear', dtick=1)
                 figure.write_image(str(target))
         except Exception as exc:
             print(f'{name} failed: {exc}', flush=True)

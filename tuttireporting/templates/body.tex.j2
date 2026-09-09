@@ -26,9 +26,12 @@ Parameter / statistic & Value \\
 \end{longtable}
 \BLOCK{endif}
 \BLOCK{for plot in section.plots}
-\begin{figure}[htbp]
+\begin{figure}[\VAR{plot.layout.placement}]
 \centering
-\includegraphics[width=0.95\linewidth,height=0.72\textheight,keepaspectratio]{\VAR{plot.path}}
+\BLOCK{if plot.layout.x_offset}
+\hspace*{\VAR{plot.layout.x_offset}\linewidth}%
+\BLOCK{endif}
+\includegraphics[width=\VAR{plot.layout.width}\linewidth\BLOCK{if plot.layout.height is defined},height=\VAR{plot.layout.height}\textheight,keepaspectratio\BLOCK{endif}]{\VAR{plot.path}}
 \caption{\VAR{prose(plot.caption_parts)}}
 \label{\VAR{plot.label}}
 \end{figure}

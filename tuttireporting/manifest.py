@@ -227,7 +227,7 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
             _keys(section, {'title', 'text', 'new_page', 'omit_if_empty', 'missing',
                             'stats', 'config', 'plots', 'sections', 'paragraphs',
                             'figure_notes', 'after_plots', 'bullets', 'closing_paragraphs',
-                            'plot_captions', 'reviewer_comment'}, 'section')
+                            'plot_captions', 'plot_layout', 'reviewer_comment'}, 'section')
             if not isinstance(section.get('title'), str) or not section['title'].strip():
                 raise ValueError('Each section needs a non-empty title')
             if not isinstance(section.get('text', ''), str):
@@ -260,9 +260,24 @@ def load_report(manifest_path: str | Path, report_path: str | Path | None = None
             captions = section.get('plot_captions', {})
             if not isinstance(captions, dict) or any(not isinstance(v, str) for v in captions.values()):
                 raise ValueError('section.plot_captions must be a table of strings')
+            layout = section.get('plot_layout', {'width': 0.95, 'height': 0.72})
+            _keys(layout, {'width', 'height', 'x_offset', 'placement'}, 'section.plot_layout')
+            layout = {'width': 1.0, 'x_offset': 0.0, **layout}
+            placement = layout.get('placement', 'htbp')
+            if not isinstance(placement, str) or not re.fullmatch(r'!?[htbp]+', placement):
+                raise ValueError('section.plot_layout.placement must use h, t, b, p with an optional leading !')
+            for dimension, value in layout.items():
+                if dimension == 'placement':
+                    continue
+                if (isinstance(value, bool) or not isinstance(value, (int, float))
+                        or not math.isfinite(value)
+                        or (dimension != 'x_offset' and value <= 0)):
+                    raise ValueError(f'section.plot_layout.{dimension} must be a finite '
+                                     + ('number' if dimension == 'x_offset' else 'positive number'))
             figures = []
             for key in select(section, 'plots', plots, failures):
                 figure = dict(plots[key])
+                figure['layout'] = {**layout, 'placement': placement}
                 # Resolve catalog captions with the same safe references as prose.
                 custom = paragraphs({'paragraphs': [captions[key]]}) if key in captions else []
                 figure['caption_parts'] = custom[0] if custom else [{'text': figure['caption']}]

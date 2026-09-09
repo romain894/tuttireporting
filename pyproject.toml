@@ -37,6 +37,10 @@ include-package-data = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
+filterwarnings = [
+    # Kaleido 0.2.1 is pinned for dibisoplot 0.9 compatibility.
+    'ignore:^setDaemon\(\) is deprecated, set the daemon attribute instead$:DeprecationWarning:^kaleido\.scopes\.base$',
+]
 markers = [
     "pdf: offline tests requiring LaTeX tools",
     "live: integration tests requiring network access and example dependencies",
