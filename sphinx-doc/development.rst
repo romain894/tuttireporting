@@ -18,6 +18,25 @@ and ``biber``; missing tools are reported as skips). Run ``make test-live`` for
 live checks, which also require those tools and the example dependencies.
 Live failures are reported as failures, including unavailable services.
 
+``test-pdf``, ``test-live``, and ``test-all`` use two pytest-xdist worker processes
+by default. Catalog entries can compile concurrently in separate temporary
+projects. A file lock shares one full producer run between catalog workers;
+only data generation is locked, not LaTeX compilation. Producer failures are
+shared too, so another worker does not repeat a failed network fetch.
+
+Use ``TEST_WORKERS=4`` to increase parallelism, or ``TEST_WORKERS=0`` for serial
+execution. For example::
+
+    make test-all TEST_WORKERS=4
+    make test-live TEST_WORKERS=2 PYTEST_ARGS='-k full_catalog'
+    make test-pdf TEST_WORKERS=0
+
+Direct pytest runs remain serial unless given ``-n``, for example
+``python -m pytest --run-pdf -n 2 --dist=load --maxschedchunk=1``.
+Install the updated ``.[dev]`` dependencies to obtain pytest-xdist and filelock.
+``make test`` stays serial because the fast suite does not benefit from worker
+startup overhead.
+
 Pass pytest options with ``PYTEST_ARGS``, for example::
 
     make test PYTEST_ARGS='-k catalog'

@@ -117,3 +117,8 @@ each writing area easy to find. The file is preserved on rebuild and included
 in ZIP exports. Instructions are invisible in the PDF; reviewer text
 is printed. Keep the ID stable. For a commentary-only section, also set
 `omit_if_empty = false`. Omit `reviewer_comment` to disable the area.
+
+PDF and live test commands run with two worker processes by default; catalog
+reports share one producer run and compile independently. Use
+`make test-all TEST_WORKERS=4` to increase parallelism, or `TEST_WORKERS=0`
+to run serially. Install the updated `.[dev]` dependencies first.

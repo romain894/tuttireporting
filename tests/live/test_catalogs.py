@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 import pytest
+from filelock import FileLock
 
 from tuttireporting import build_project
 from tuttireporting.builder import compile_project
@@ -14,9 +15,8 @@ from tuttireporting.catalog import list_reports
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@pytest.fixture(scope='module')
-def full_manifest(tmp_path_factory):
-    data = tmp_path_factory.mktemp('catalog-data')
+def _produce_full_manifest(data):
+    data.mkdir(parents=True, exist_ok=True)
     result = subprocess.run(
         [sys.executable, str(ROOT / 'examples/biso/produce.py'), '--full',
          '--entity-id', os.environ.get('BISO_ENTITY', 'UNIV-PARIS-SACLAY'),
@@ -35,6 +35,28 @@ def full_manifest(tmp_path_factory):
     content.setdefault('config', {})['include_bibliography'] = True
     manifest.write_text(tomli_w.dumps(content), encoding='utf-8')
     return manifest
+
+
+@pytest.fixture(scope='module')
+def full_manifest(tmp_path_factory, worker_id):
+    # xdist gives each worker its own base directory beneath the shared run.
+    # Only producer setup is locked; report builds and compilation run in parallel.
+    base = tmp_path_factory.getbasetemp()
+    shared = base if worker_id == 'master' else base.parent
+    data = shared / 'catalog-data'
+    ready = shared / 'catalog-data.ready'
+    failed = shared / 'catalog-data.failed'
+    with FileLock(str(shared / 'catalog-data.lock'), timeout=660):
+        if failed.exists():
+            pytest.fail(failed.read_text(encoding='utf-8'))
+        if not ready.exists():
+            try:
+                _produce_full_manifest(data)
+            except Exception as error:
+                failed.write_text(str(error), encoding='utf-8')
+                raise
+            ready.write_text('ready\n', encoding='utf-8')
+    return data / 'manifest.toml'
 
 
 @pytest.mark.parametrize('catalog', list_reports())
