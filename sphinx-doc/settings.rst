@@ -104,6 +104,44 @@ Explicit ``stats`` and ``config`` selectors produce two-column tables. Prefer
 not also select it for a table. Unknown fields and invalid types are rejected.
 Text values are escaped for LaTeX.
 
+Reviewer comment areas
+~~~~~~~~~~~~~~~~~~~~~~
+
+Add an optional ``reviewer_comment`` table to a section in ``report.toml``::
+
+    [[sections]]
+    title = "Types de publications"
+    plots = ["works_type"]
+    reviewer_comment = {id = "works-type", style = "block", prompt = "Écrire votre commentaire ci-dessous :"}
+
+``style = "comment"`` creates a simple LaTeX comment prompt.
+``style = "block"`` (the default) adds a separator and BEGIN/END markers with
+blank lines between them. These instructions are source comments and do not
+appear in the PDF. Text the reviewer writes between them is ordinary LaTeX
+and appears in the report.
+
+The builder places the writing area directly in ``main.tex`` at the end of the
+section, after its figures, explanatory notes, and closing paragraphs, before
+child sections. Five blank source lines separate the prompt from its end marker
+(or the following content for a simple prompt). Edit the report and add text in
+this single file, including in Overleaf. Its contents are preserved byte-for-byte
+on rebuild and included in ZIP exports. Prompts do not create empty PDF boxes.
+Do not write review text into ``generated_body.tex``.
+LaTeX figures remain floats, so their final page placement follows LaTeX rules.
+
+``id`` is required and must be unique across all sections, using lowercase
+letters, digits, hyphens, or underscores. Keep it stable when renaming or
+reordering sections so the same commentary stays attached. ``prompt`` defaults
+to ``Comment on:`` followed by the section title. Prompt/style changes apply to
+new projects only; edit existing ``main.tex`` directly to update instructions.
+The ``comments/`` directory is reserved and cannot be an asset destination.
+
+Omit ``reviewer_comment`` to disable an area in new projects. Existing
+``main.tex`` files remain unchanged. Normal empty-section omission still applies; use
+``omit_if_empty = false`` for a section intended only for reviewer text, such as
+recommendations. The BiSO catalog includes block prompts at the locations used
+in the earlier report.
+
 Writing sentences with live values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -135,7 +173,7 @@ notice instead of aborting the entire report. Invalid syntax and unsafe paths
 still raise an error.
 
 Reusable explanatory sentences belong here; researcher interpretation and review
-comments still belong in the preserved ``main.tex``. The BiSO example and both
+comments belong in the preserved ``main.tex``. The BiSO example and both
 catalog layouts use prose; the automatic layout remains a generic table view.
 
 Without ``--report`` or ``--catalog``, the builder uses inline ``report`` and
@@ -146,8 +184,17 @@ these sections. An external definition replaces the inline layout and metadata.
 Generated project
 -----------------------
 
-``main.tex`` is created once and never overwritten. Put commentary there.
-``generated_variables.tex`` and ``generated_body.tex`` are regenerated.
+``main.tex`` is created once with the complete report body and never overwritten.
+Edit section headings, prose, figures, and reviewer commentary directly there.
+``generated_variables.tex`` and assets are refreshed on rebuild, so referenced
+macro values and existing figures update. Structural changes (new/removed
+sections, prompts, or incomplete-section notices) require a fresh output directory
+or manual edits to ``main.tex``. Keep the old project to transfer reviewer edits.
+``generated_body.tex`` is regenerated as a reference copy; new main files do not
+import it. Bibliography activation remains in ``generated_bibliography.tex``.
+Older projects that import ``generated_body.tex`` continue using their split
+layout and preserved ``comments/*.tex`` files. Build into a fresh output directory
+to adopt the single-file editing layout without overwriting existing work.
 Referenced figures are copied into ``plots/``. Template assets retain the paths
 declared by their registry (for example, ``tutti/``, ``dibiso/``, or ``company/``).
 Unreferenced files from previous builds are retained.

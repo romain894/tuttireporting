@@ -13,7 +13,7 @@ help:
 	@echo "make test       Run the fast offline tests"
 	@echo "make test-pdf   Run offline tests including LaTeX compilation"
 	@echo "make test-live  Run live producer and catalog integration tests"
-	@echo "make test-all   Run all tests and save catalog PDFs under $(TEST_REPORTS_DIR)"
+	@echo "make test-all   Run all tests and save complete catalog projects under $(TEST_REPORTS_DIR)"
 	@echo "make example    Generate the BiSO example under build/biso"
 	@echo "make docs       Build HTML documentation in docs/html"
 	@echo "make clean      Remove build outputs and Python caches"

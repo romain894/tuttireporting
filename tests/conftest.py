@@ -6,7 +6,7 @@ import pytest
 
 def pytest_addoption(parser):
     parser.addoption('--report-output-dir', type=Path,
-                     help='Keep successfully compiled catalog PDFs in this directory')
+                     help='Keep complete successfully compiled catalog projects in this directory')
     parser.addoption('--run-pdf', action='store_true', help='Include offline LaTeX tests')
     parser.addoption('--run-live', action='store_true', help='Include live integration tests')
 

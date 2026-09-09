@@ -7,6 +7,7 @@ bibliography = "references"
 
 [[sections]]
 title = "Liste des revues"
+reviewer_comment = {id = "journals", style = "block", prompt = "Écrire un commentaire sur la liste des revues dans HAL ci-dessous :"}
 plots = ["journals_hal"]
 
 [[sections]]
@@ -21,18 +22,21 @@ plots = ["chapters"]
 
 [[sections]]
 title = "Typologie de la production scientifique"
+reviewer_comment = {id = "works-type", style = "block", prompt = "Écrire un commentaire sur la typologie de la production scientifique ci-dessous :"}
 new_page = true
 paragraphs = ["Le corpus comprend {{stats.publications}} publications."]
 plots = ["works_type"]
 
 [[sections]]
 title = "Articles et Communications de congrès en accès ouvert"
+reviewer_comment = {id = "open-access", style = "block", prompt = "Écrire un commentaire sur les articles et communications de congrès en accès ouvert ci-dessous :"}
 new_page = true
 paragraphs = ["L’évolution de l’accès ouvert est présentée sur la période {{stats.oaworksperiod}}."]
 plots = ["open_access_works"]
 
 [[sections]]
 title = "Liste des revues et les voies d'accès ouvert repérés dans le BSO"
+reviewer_comment = {id = "bso-journals", style = "block", prompt = "Écrire un commentaire sur les voies d’accès ouvert repérées dans le BSO ci-dessous :"}
 new_page = true
 paragraphs = [
   "Sur {{stats.bsojournalsnbworks}} travaux dans HAL, {{stats.bsojournalsnbworksfoundinbso}} ont été trouvés dans le BSO.",
@@ -58,6 +62,7 @@ plots = ["collaboration_names"]
 
 [[sections]]
 title = "Collaborations avec le secteur privé"
+reviewer_comment = {id = "private-collaborations", style = "block", prompt = "Écrire un commentaire sur les collaborations avec le secteur privé ci-dessous :"}
 new_page = true
 plots = ["private_sector_collaborations"]
 
@@ -72,14 +77,19 @@ plots = ["anr_projects"]
 
 [[sections]]
 title = "Jeux de données partagés"
+reviewer_comment = {id = "shared-data", style = "block", prompt = "Écrire un commentaire sur les jeux de données partagés ci-dessous :"}
 new_page = true
 text = "Un guichet unique est à votre disposition pour vous accompagner sur toutes les questions en lien avec les données de la recherche."
 
 [[sections]]
 title = "Les atouts du Laboratoire dans son engagement pour la science ouverte"
+reviewer_comment = {id = "strengths", style = "block", prompt = "Écrire un commentaire sur les atouts du laboratoire dans son engagement pour la science ouverte ci-dessous :"}
+omit_if_empty = false
 new_page = true
 text = ""
 
 [[sections]]
 title = "Préconisations, pour aller plus loin"
+reviewer_comment = {id = "recommendations", style = "block", prompt = "Écrire un commentaire sur les préconisations, pour aller plus loin ci-dessous :"}
+omit_if_empty = false
 text = ""

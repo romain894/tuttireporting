@@ -27,13 +27,15 @@ Pass pytest options with ``PYTEST_ARGS``, for example::
 The last command runs every group and saves successfully compiled catalog PDFs
 for manual review:
 
-* ``build/test-reports/biso/main.pdf``
-* ``build/test-reports/pubpart/main.pdf``
+* ``build/test-reports/biso/`` (the complete report project, including the PDF,
+  plots, LaTeX sources, generated files, bibliography, and compilation logs)
+* ``build/test-reports/pubpart/`` (the complete report project)
 
 Override the destination with ``make test-all TEST_REPORTS_DIR=/tmp/reports``.
-Each report is compiled in a fresh temporary project before its PDF is copied,
-so existing ``main.tex`` files cannot hide template changes. Other test outputs
-remain temporary; use pytest's ``--basetemp`` option to choose their location.
+Each report is compiled in a fresh temporary project before the complete project
+is copied, so existing ``main.tex`` files cannot hide template changes. Other
+test outputs remain temporary; use pytest's ``--basetemp`` option to choose
+their location.
 Direct pytest runs can opt in with ``--report-output-dir=build/test-reports``.
 The current live catalog fixture supplies BiSO data; the pubpart PDF therefore
 shows missing-figure notices until a PubPart/OpenAlex producer is supplied.

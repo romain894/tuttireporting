@@ -48,12 +48,15 @@ def test_full_catalog_compiles(full_manifest, tmp_path, catalog, pytestconfig):
         assert r'\entry{' in (output / 'main.bbl').read_text(encoding='utf-8')
 
     # Compile in a fresh temporary project so preserved main.tex files cannot
-    # mask template changes. Export only the checked PDF for manual review.
+    # mask template changes. Keep the complete project for manual inspection.
     report_output = pytestconfig.getoption('--report-output-dir')
     if report_output is not None:
-        destination = report_output / catalog / 'main.pdf'
+        destination = report_output / catalog
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(output / 'main.pdf', destination)
+        shutil.copytree(output, destination, dirs_exist_ok=True)
+        assert (destination / 'main.tex').is_file()
+        assert (destination / 'generated_body.tex').is_file()
+        assert any(destination.glob('plots/*'))
         reporter = pytestconfig.pluginmanager.get_plugin('terminalreporter')
         if reporter is not None:
-            reporter.write_line(f'{catalog} PDF: {destination.resolve()}')
+            reporter.write_line(f'{catalog} report: {destination.resolve()}')

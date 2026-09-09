@@ -14,8 +14,10 @@ Three inputs have different roles:
 
 A figure's `output_name` in the manifest matches a selector in `report.toml`.
 The builder resolves these names, generates headings, prose, tables and figures, and copies
-the assets. Existing `main.tex` is preserved for your commentary; generated
-content is updated on each build.
+the assets. New `main.tex` files contain the complete report body: headings,
+prose, tables, figures, and spaced reviewer areas are directly editable in Overleaf.
+Existing `main.tex` is preserved; data macros and assets update on each build.
+Use a fresh output directory to regenerate the report structure.
 
 Write sentences with live values in `report.toml`, for example
 `paragraphs = ["Le corpus comprend {{stats.publications}} publications."]`.
@@ -59,7 +61,8 @@ Use a fresh output directory when switching templates to get its starter file.
 
 If a selected plot or value is unavailable, the report is still assembled and
 the affected section contains a visible incomplete-section notice. Fix the data
-and run the same command again; `main.tex` remains preserved. Malformed TOML,
+and build into a fresh output directory to regenerate those sections; existing
+`main.tex` remains preserved. Malformed TOML,
 invalid references, and unsafe paths still stop the build.
 
 ## Understand and develop
@@ -100,3 +103,17 @@ and `generated_bibliography.tex` contains `% \makebiblio` for later activation.
 Supplied assets are still copied. Rebuilding regenerates this command while
 preserving `main.tex`; existing projects need the updated starter's bibliography
 setup and `\input{generated_bibliography.tex}` (or a fresh output directory).
+
+To provide a reviewer writing area after a section, add this to its
+`[[sections]]` table in `report.toml`:
+
+```toml
+reviewer_comment = {id = "works-type", style = "block", prompt = "Écrire votre commentaire ci-dessous :"}
+```
+
+Use `style = "comment"` for a simple prompt, or `"block"` for start/end markers.
+Write directly between the prompts in `main.tex`; five blank source lines make
+each writing area easy to find. The file is preserved on rebuild and included
+in ZIP exports. Instructions are invisible in the PDF; reviewer text
+is printed. Keep the ID stable. For a commentary-only section, also set
+`omit_if_empty = false`. Omit `reviewer_comment` to disable the area.

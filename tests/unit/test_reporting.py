@@ -54,6 +54,11 @@ class ReportingTests(unittest.TestCase):
         self.assertIn('\\clearpage\n\n\\section{Results}', body)
         self.assertIn(r'\subsection{Measurements}', body)
         self.assertNotIn('Optional diagnostics', body)
+        main = (self.output / 'main.tex').read_text()
+        self.assertIn(r'\section{Results}', main)
+        self.assertIn(r'\subsection{Measurements}', main)
+        self.assertIn(r'\includegraphics', main)
+        self.assertNotIn(r'\input{generated_body.tex}', main)
         self.assertIn(r'Complete: 100\%', body)
         self.assertLess(body.index('Run configuration'), body.index('Measurements'))
         report = load_report(self.manifest)
@@ -208,6 +213,73 @@ destination = "references.bib"
                         self.assertEqual(before, (self.output / 'main.tex').read_bytes())
         self.manifest.write_text('[config]\ninclude_bibliography = "true"\n')
         with self.assertRaisesRegex(ValueError, 'must be a boolean'):
+            self.build()
+
+    def test_reviewer_comments_are_preserved_and_follow_section_content(self):
+        self.layout.write_text('''[report]
+[[sections]]
+title = "Review"
+text = "Before the reviewer text."
+reviewer_comment = {id = "review", style = "block", prompt = "Écrire ici.\\nSecond line."}
+[[sections]]
+title = "Recommendations"
+omit_if_empty = false
+reviewer_comment = {id = "recommendations", style = "comment"}
+''')
+        self.build()
+        comment = self.output / 'main.tex'
+        starter = comment.read_text()
+        self.assertIn('% BEGIN REVIEWER COMMENT', starter)
+        self.assertIn('% Écrire ici.\n% Second line.', starter)
+        self.assertIn('% END REVIEWER COMMENT', starter)
+        self.assertEqual(starter.count('BEGIN REVIEWER'), 1)
+        self.assertFalse((self.output / 'comments').exists())
+        self.assertNotIn(r'\input{generated_body.tex}', starter)
+        self.assertNotIn(r'\input{comments/', starter)
+        self.assertIn('Second line.\n\n\n\n\n\n% END REVIEWER COMMENT', starter)
+        body = (self.output / 'generated_body.tex').read_text()
+        self.assertLess(body.index('Before the reviewer text.'), body.index('% BEGIN REVIEWER COMMENT'))
+        comment.write_text(starter.replace('\n\n\n\n', '\nReviewer interpretation.\n'))
+        before = comment.read_bytes(), comment.stat().st_mtime_ns
+        self.layout.write_text(self.layout.read_text().replace('title = "Review"', 'title = "Renamed"'))
+        self.build()
+        self.assertEqual(before, (comment.read_bytes(), comment.stat().st_mtime_ns))
+        from tuttireporting.builder import zip_project
+        with zipfile.ZipFile(zip_project(self.output)) as archive:
+            self.assertEqual(archive.read('main.tex'), before[0])
+
+    def test_legacy_split_project_preserves_comments(self):
+        self.layout.write_text('[[sections]]\ntitle="Review"\nomit_if_empty=false\n'
+                               'reviewer_comment={id="review"}\n')
+        self.output.mkdir()
+        main = self.output / 'main.tex'
+        main.write_text(r'\input{generated_body.tex}')
+        comments = self.output / 'comments'
+        comments.mkdir()
+        review = comments / 'review.tex'
+        review.write_text('Existing reviewer text.\n')
+        self.build()
+        self.assertEqual(main.read_text(), r'\input{generated_body.tex}')
+        self.assertEqual(review.read_text(), 'Existing reviewer text.\n')
+        self.assertIn(r'\input{comments/review.tex}',
+                      (self.output / 'generated_body.tex').read_text())
+
+    def test_reviewer_comment_validation_and_paths(self):
+        for comment in ('{id="../escape"}', '{id="review", style="unknown"}',
+                        '{id="review", prompt=1}', '{}', '"text"'):
+            with self.subTest(comment=comment):
+                self.layout.write_text('[report]\n[[sections]]\ntitle="Review"\n'
+                                       f'reviewer_comment={comment}\n')
+                with self.assertRaises(ValueError):
+                    self.build()
+        section = '[[sections]]\ntitle="Review"\nomit_if_empty=false\nreviewer_comment={id="review"}\n'
+        self.layout.write_text('[report]\n' + section * 2)
+        with self.assertRaisesRegex(ValueError, 'Duplicate reviewer_comment'):
+            self.build()
+        self.layout.write_text('[report]\n' + section)
+        self.output.mkdir()
+        (self.output / 'comments').symlink_to(self.source, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'symlink'):
             self.build()
 
     def test_symlink_output_rejected(self):

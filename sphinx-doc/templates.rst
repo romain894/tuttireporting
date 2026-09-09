@@ -48,6 +48,11 @@ it is to use the generated content::
     ...
     \input{generated_body.tex}
 
+On first creation, the builder expands the literal ``\input{generated_body.tex}``
+into editable sections directly in ``main.tex``. Keep that placeholder in the
+template source. Generated variables remain imported so data macros can refresh
+without overwriting reviewer edits.
+
 Adapters for untouched releases
 -------------------------------
 
